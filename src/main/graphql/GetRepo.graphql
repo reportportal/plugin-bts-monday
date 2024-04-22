@@ -1,0 +1,46 @@
+query GetItems($ids: [ID!]){
+    items(ids: $ids) {
+        id
+        name
+        column_values {
+            ... on StatusValue {
+                id
+                index
+                text
+                type
+            }
+        }
+    }
+}
+
+mutation CreateIssue($boardId: ID!, $name: String!, $columnValues: JSON){
+    create_item (board_id: $boardId, item_name: $name, column_values: $columnValues) {
+        id
+    }
+}
+
+mutation CreateIssueUpdateSection($itemId: ID!, $parentId: ID, $body: String!) {
+    create_update(item_id: $itemId, parent_id: $parentId, body: $body) {
+        id
+    }
+}
+
+mutation AddFile($file: File!, $updateId: ID!) {
+    add_file_to_update(file: $file, update_id: $updateId) {
+        id
+    }
+}
+
+query GetBoardConfig($boardIds: [ID!]){
+    boards(ids: $boardIds) {
+        id
+        name
+        columns {
+            id
+            title
+            settings_str
+            type
+        }
+    }
+}
+

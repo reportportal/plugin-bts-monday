@@ -1,3 +1,2 @@
-rootProject.name = 'plugin-template-epam'
-include 'plugin'
+rootProject.name = 'plugin-bts-monday'
 
