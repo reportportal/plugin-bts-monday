@@ -5,7 +5,7 @@ export const IntegrationFormFields = (props) => {
   const { initialize, disabled, initialData, updateMetaData, ...extensionProps } = props;
   const {
     components: { FieldErrorHint, FieldElement, FieldText, FieldTextFlex },
-    validators: { requiredField, btsUrl, btsProjectKey, btsIntegrationName },
+    validators: { requiredField, btsUrl, btsBoardId, btsIntegrationName },
     constants: { SECRET_FIELDS_KEY },
   } = extensionProps;
 
@@ -24,12 +24,20 @@ export const IntegrationFormFields = (props) => {
         validate={btsIntegrationName}
         disabled={disabled}
         isRequired
+        dataAutomationId="integrationNameField"
       >
         <FieldErrorHint provideHint={false}>
           <FieldText defaultWidth={false} />
         </FieldErrorHint>
       </FieldElement>
-      <FieldElement name="url" label={LABELS.URL} validate={btsUrl} disabled={disabled} isRequired>
+      <FieldElement
+        name="url"
+        label={LABELS.URL}
+        validate={btsUrl}
+        disabled={disabled}
+        isRequired
+        dataAutomationId="linkToBTSField"
+      >
         <FieldErrorHint provideHint={false}>
           <FieldText defaultWidth={false} />
         </FieldErrorHint>
@@ -37,9 +45,10 @@ export const IntegrationFormFields = (props) => {
       <FieldElement
         name="project"
         label={LABELS.BOARD_ID}
-        validate={btsProjectKey}
+        validate={btsBoardId}
         disabled={disabled}
         isRequired
+        dataAutomationId="boardInBTSField"
       >
         <FieldErrorHint provideHint={false}>
           <FieldText defaultWidth={false} />
@@ -51,6 +60,7 @@ export const IntegrationFormFields = (props) => {
         disabled={disabled}
         validate={requiredField}
         isRequired
+        dataAutomationId="apiTokenField"
       >
         <FieldErrorHint provideHint={false}>
           <FieldTextFlex />
