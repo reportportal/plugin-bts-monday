@@ -51,6 +51,13 @@ public class TestConnectionCommand implements PluginCommand<Boolean> {
             "Integration params are not specified."
         ));
 
+    String url = MondayProperties.URL.getParam(integrationParams);
+
+    if (!url.startsWith("https://") || !url.contains(".monday.com")) {
+      throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+          "Invalid URL.");
+    }
+
     String boardId = MondayProperties.PROJECT.getParam(integrationParams);
 
     MondayClient mondayClient = mondayClientProvider.provide(integrationParams);
