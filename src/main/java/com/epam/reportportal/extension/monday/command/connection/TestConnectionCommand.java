@@ -16,13 +16,13 @@
 
 package com.epam.reportportal.extension.monday.command.connection;
 
+import static com.epam.reportportal.rules.exception.ErrorType.UNABLE_INTERACT_WITH_INTEGRATION;
 import static java.util.Optional.ofNullable;
 
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.monday.client.MondayClient;
 import com.epam.reportportal.extension.monday.client.MondayClientProvider;
 import com.epam.reportportal.extension.monday.model.enums.MondayProperties;
-import com.epam.reportportal.rules.exception.ErrorType;
 import com.epam.reportportal.rules.exception.ReportPortalException;
 import com.epam.ta.reportportal.entity.integration.Integration;
 import com.epam.ta.reportportal.entity.integration.IntegrationParams;
@@ -47,14 +47,14 @@ public class TestConnectionCommand implements PluginCommand<Boolean> {
   @Override
   public Boolean executeCommand(Integration integration, Map<String, Object> params) {
     IntegrationParams integrationParams = ofNullable(integration.getParams()).orElseThrow(
-        () -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+        () -> new ReportPortalException(UNABLE_INTERACT_WITH_INTEGRATION,
             "Integration params are not specified."
         ));
 
     String url = MondayProperties.URL.getParam(integrationParams);
 
     if (!url.startsWith("https://") || !url.contains(".monday.com")) {
-      throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+      throw new ReportPortalException(UNABLE_INTERACT_WITH_INTEGRATION,
           "Invalid URL.");
     }
 
@@ -62,6 +62,8 @@ public class TestConnectionCommand implements PluginCommand<Boolean> {
 
     MondayClient mondayClient = mondayClientProvider.provide(integrationParams);
 
-    return mondayClient.getBoard(boardId).map(b -> Boolean.TRUE).orElse(Boolean.FALSE);
+    return mondayClient.getBoard(boardId).map(b -> Boolean.TRUE).orElseThrow(
+        () -> new ReportPortalException(UNABLE_INTERACT_WITH_INTEGRATION,
+            "Board with provided id {} not found", boardId));
   }
 }
