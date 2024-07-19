@@ -44,11 +44,13 @@ import org.slf4j.LoggerFactory;
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
 public class GetIssueFieldsCommand extends ProjectManagerCommand<List<PostFormField>> {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(GetIssueFieldsCommand.class);
 
   //	TODO probably more
   private final Set<ColumnType> excludedColumnTypes =
-      Set.of(ColumnType.item_id, ColumnType.file, ColumnType.last_updated);
+      Set.of(ColumnType.item_id, ColumnType.file, ColumnType.last_updated, ColumnType.timeline,
+          ColumnType.subtasks);
 
   private final MondayClientProvider mondayClientProvider;
   private final ObjectMapper objectMapper;
