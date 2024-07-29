@@ -16,6 +16,7 @@
 
 package com.epam.reportportal.extension.monday.command.connection;
 
+import static com.epam.reportportal.rules.exception.ErrorType.BAD_REQUEST_ERROR;
 import static com.epam.reportportal.rules.exception.ErrorType.UNABLE_INTERACT_WITH_INTEGRATION;
 import static java.util.Optional.ofNullable;
 
@@ -60,10 +61,20 @@ public class TestConnectionCommand implements PluginCommand<Boolean> {
 
     String boardId = MondayProperties.PROJECT.getParam(integrationParams);
 
+    verifyBoardId(boardId);
+
     MondayClient mondayClient = mondayClientProvider.provide(integrationParams);
 
     return mondayClient.getBoard(boardId).map(b -> Boolean.TRUE).orElseThrow(
         () -> new ReportPortalException(UNABLE_INTERACT_WITH_INTEGRATION,
             "Board with provided id {} not found", boardId));
+  }
+
+  private void verifyBoardId(String boardId) {
+    try {
+      Long.parseLong(boardId);
+    } catch (NumberFormatException e) {
+      throw new ReportPortalException(BAD_REQUEST_ERROR, "Invalid Board ID");
+    }
   }
 }
