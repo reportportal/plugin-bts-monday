@@ -124,9 +124,7 @@ public class PostTicketCommand extends ProjectMemberCommand<Ticket> {
     ticket.setId(issueId);
     ticket.setSummary(name);
     ticket.setTicketUrl(
-        Suppliers.formattedSupplier("{}/boards/{}/pulses/{}", removeTrailingSlash(url), boardId,
-            issueId).get());
-
+        Suppliers.formattedSupplier("{}/boards/{}/pulses/{}", url, boardId, issueId).get());
     return ticket;
   }
 
@@ -183,11 +181,5 @@ public class PostTicketCommand extends ProjectMemberCommand<Ticket> {
     }));
   }
 
-  private String removeTrailingSlash(String url) {
-    if (url.endsWith("/")) {
-      return url.substring(0, url.length() - 1);
-    }
-    return url;
-  }
 
 }
