@@ -52,9 +52,9 @@ dependencies {
         implementation('com.epam.reportportal:commons-dao')
         annotationProcessor 'com.epam.reportportal:plugin-api'
     } else {
-        implementation("com.github.reportportal:plugin-api:17962f8c32")
-        annotationProcessor 'com.github.reportportal:plugin-api:17962f8c32'
-        implementation 'com.github.reportportal:commons-dao:073aa934a5'
+        implementation("com.github.reportportal:plugin-api:a9a8b73")
+        annotationProcessor 'com.github.reportportal:plugin-api:a9a8b73'
+        implementation 'com.github.reportportal:commons-dao:b9dc960'
     }
 
     hello("com.apollographql.apollo3:apollo-runtime:3.8.2")

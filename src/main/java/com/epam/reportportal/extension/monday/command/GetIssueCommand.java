@@ -104,6 +104,7 @@ public class GetIssueCommand implements CommonPluginCommand<Ticket> {
     Ticket ticket = new Ticket();
     ticket.setId(issue.id);
     ticket.setSummary(issue.name);
+    ticket.setStatus("");
     ofNullable(issue.column_values).flatMap(
             values -> values.stream().filter(v -> Objects.nonNull(v.onStatusValue))
                 .map(v -> v.onStatusValue).filter(s -> Objects.nonNull(s.id))
