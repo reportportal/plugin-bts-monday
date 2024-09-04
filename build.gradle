@@ -41,7 +41,7 @@ configurations {
 
 dependencyManagement {
     imports {
-        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:5.11.7' : 'com.github.reportportal:commons-bom:04b1a7d')
+        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:5.12.1' : 'com.epam.reportportal:commons-bom:5.12.1')
     }
 }
 
@@ -52,9 +52,9 @@ dependencies {
         implementation('com.epam.reportportal:commons-dao')
         annotationProcessor 'com.epam.reportportal:plugin-api'
     } else {
-        implementation("com.github.reportportal:plugin-api:17962f8c32")
-        annotationProcessor 'com.github.reportportal:plugin-api:17962f8c32'
-        implementation 'com.github.reportportal:commons-dao:073aa934a5'
+        implementation("com.github.reportportal:plugin-api:188792e")
+        annotationProcessor 'com.github.reportportal:plugin-api:188792e'
+        implementation 'com.github.reportportal:commons-dao:acf1ec7'
     }
 
     hello("com.apollographql.apollo3:apollo-runtime:3.8.2")
