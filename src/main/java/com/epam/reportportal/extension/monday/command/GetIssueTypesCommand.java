@@ -38,6 +38,6 @@ public class GetIssueTypesCommand extends ProjectManagerCommand<List<String>> {
 
   @Override
   protected List<String> invokeCommand(Integration integration, Map<String, Object> params) {
-    return List.of("Task");
+    return List.of();
   }
 }

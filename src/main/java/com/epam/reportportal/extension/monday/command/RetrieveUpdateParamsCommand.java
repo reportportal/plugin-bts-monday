@@ -16,6 +16,8 @@
 
 package com.epam.reportportal.extension.monday.command;
 
+import static com.epam.reportportal.extension.monday.utils.ParamUtils.normalizeUrl;
+
 import com.epam.reportportal.extension.CommonPluginCommand;
 import com.epam.reportportal.extension.monday.model.enums.MondayProperties;
 import com.google.common.collect.Maps;
@@ -43,7 +45,7 @@ public class RetrieveUpdateParamsCommand implements CommonPluginCommand<Map<Stri
   public Map<String, Object> executeCommand(Map<String, Object> integrationParams) {
     Map<String, Object> resultParams = Maps.newHashMapWithExpectedSize(integrationParams.size());
     MondayProperties.URL.findParam(integrationParams)
-        .ifPresent(boardId -> resultParams.put(MondayProperties.URL.getName(), boardId));
+        .ifPresent(url -> resultParams.put(MondayProperties.URL.getName(), normalizeUrl(url)));
     MondayProperties.PROJECT.findParam(integrationParams)
         .ifPresent(boardId -> resultParams.put(MondayProperties.PROJECT.getName(), boardId));
     MondayProperties.API_TOKEN.findParam(integrationParams).ifPresent(

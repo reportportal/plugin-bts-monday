@@ -16,6 +16,7 @@ import com.epam.ta.reportportal.entity.log.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -27,7 +28,7 @@ public class LogSender {
 
   private static final String TEST_EXECUTION_LOG_TITLE = "Test execution log:";
 
-  private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+  private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
 
   private final MondayClient mondayClient;
   private final DataStoreService dataStoreService;

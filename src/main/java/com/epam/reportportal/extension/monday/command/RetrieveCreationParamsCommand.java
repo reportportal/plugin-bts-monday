@@ -16,6 +16,7 @@
 
 package com.epam.reportportal.extension.monday.command;
 
+import static com.epam.reportportal.extension.monday.utils.ParamUtils.normalizeUrl;
 import static com.epam.reportportal.rules.commons.validation.BusinessRule.expect;
 
 import com.epam.reportportal.extension.CommonPluginCommand;
@@ -51,8 +52,8 @@ public class RetrieveCreationParamsCommand implements CommonPluginCommand<Map<St
     Map<String, Object> resultParams =
         Maps.newHashMapWithExpectedSize(MondayProperties.values().length);
 
-    resultParams.put(
-        MondayProperties.URL.getName(), MondayProperties.URL.getParam(integrationParams));
+    resultParams.put(MondayProperties.URL.getName(),
+        normalizeUrl(MondayProperties.URL.getParam(integrationParams)));
     resultParams.put(
         MondayProperties.PROJECT.getName(), MondayProperties.PROJECT.getParam(integrationParams));
     resultParams.put(MondayProperties.API_TOKEN.getName(),
@@ -61,4 +62,5 @@ public class RetrieveCreationParamsCommand implements CommonPluginCommand<Map<St
 
     return resultParams;
   }
+
 }

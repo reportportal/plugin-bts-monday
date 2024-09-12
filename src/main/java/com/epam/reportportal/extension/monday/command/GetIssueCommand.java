@@ -104,11 +104,12 @@ public class GetIssueCommand implements CommonPluginCommand<Ticket> {
     Ticket ticket = new Ticket();
     ticket.setId(issue.id);
     ticket.setSummary(issue.name);
+    ticket.setStatus("");
     ofNullable(issue.column_values).flatMap(
             values -> values.stream().filter(v -> Objects.nonNull(v.onStatusValue))
                 .map(v -> v.onStatusValue).filter(s -> Objects.nonNull(s.id))
                 .filter(s -> s.id.contains("status")).findFirst())
-        .ifPresent(s -> ticket.setStatus(s.text));
+        .ifPresentOrElse(s -> ticket.setStatus(s.text), () -> ticket.setStatus(""));
     ticket.setTicketUrl(
         Suppliers.formattedSupplier("{}/boards/{}/pulses/{}", url, boardId, issue.id).get());
     return ticket;
