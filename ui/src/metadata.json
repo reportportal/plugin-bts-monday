@@ -1,0 +1,17 @@
+{
+  "scope": "Monday",
+  "extensions": [
+    {
+      "name": "integrationFormFields",
+      "title": "Monday plugin fields",
+      "type": "uiExtension:integrationFormFields",
+      "moduleName": "./integrationFormFields"
+    },
+    {
+      "name": "integrationSettings",
+      "title": "Monday plugin settings",
+      "type": "uiExtension:integrationSettings",
+      "moduleName": "./integrationSettings"
+    }
+  ]
+}
