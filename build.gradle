@@ -18,7 +18,9 @@ apply from: scriptsUrl + '/signing.gradle'
 
 repositories {
     mavenCentral { url "https://repo1.maven.org/maven2" }
-    maven { url 'https://jitpack.io' }
+    if (!releaseMode) {
+        maven { url 'https://jitpack.io' }
+    }
 }
 
 configurations {
@@ -34,7 +36,7 @@ dependencyManagement {
 dependencies {
 
     if (releaseMode) {
-        implementation 'com.github.reportportal:commons-dao:acf1ec7'
+        implementation 'com.epam.reportportal:commons-dao'
         implementation("com.epam.reportportal:plugin-api")
         annotationProcessor 'com.epam.reportportal:plugin-api'
     } else {
