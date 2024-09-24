@@ -37,13 +37,13 @@ dependencyManagement {
 dependencies {
 
     if (releaseMode) {
+        implementation 'com.github.reportportal:commons-dao:acf1ec7'
         implementation("com.epam.reportportal:plugin-api")
-        implementation('com.epam.reportportal:commons-dao')
         annotationProcessor 'com.epam.reportportal:plugin-api'
     } else {
+        implementation 'com.github.reportportal:commons-dao:acf1ec7'
         implementation("com.github.reportportal:plugin-api:188792e")
         annotationProcessor 'com.github.reportportal:plugin-api:188792e'
-        implementation 'com.github.reportportal:commons-dao:acf1ec7'
     }
 
     hello("com.apollographql.apollo3:apollo-runtime:3.8.2")
