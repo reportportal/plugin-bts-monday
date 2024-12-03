@@ -24,7 +24,7 @@ import com.epam.reportportal.extension.monday.model.enums.MondayProperties;
 import com.epam.reportportal.rules.exception.ErrorType;
 import com.google.common.collect.Maps;
 import java.util.Map;
-import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.jasypt.util.text.BasicTextEncryptor;
 
 /**
