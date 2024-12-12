@@ -1,5 +1,5 @@
 plugins {
-    id "io.spring.dependency-management" version "1.0.9.RELEASE"
+    id "io.spring.dependency-management" version "1.1.4"
     id 'java'
     id 'jacoco'
     id "com.github.spotbugs" version "4.0.0"
@@ -18,7 +18,9 @@ apply from: scriptsUrl + '/signing.gradle'
 
 repositories {
     mavenCentral { url "https://repo1.maven.org/maven2" }
-    maven { url 'https://jitpack.io' }
+    if (!releaseMode) {
+        maven { url 'https://jitpack.io' }
+    }
 }
 
 configurations {
@@ -27,24 +29,26 @@ configurations {
 
 dependencyManagement {
     imports {
-        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:5.12.1' : 'com.epam.reportportal:commons-bom:5.12.1')
+        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:5.13.0' : 'com.epam.reportportal:commons-bom:5.13.0')
     }
 }
 
 dependencies {
 
     if (releaseMode) {
-        implementation 'com.github.reportportal:commons-dao:acf1ec7'
+        implementation 'com.epam.reportportal:commons-dao'
         implementation("com.epam.reportportal:plugin-api")
         annotationProcessor 'com.epam.reportportal:plugin-api'
     } else {
-        implementation 'com.github.reportportal:commons-dao:acf1ec7'
-        implementation("com.github.reportportal:plugin-api:188792e")
-        annotationProcessor 'com.github.reportportal:plugin-api:188792e'
+        implementation 'com.github.reportportal:commons-dao:adbb40e'
+        implementation 'com.github.reportportal:plugin-api:develop-SNAPSHOT'
+        annotationProcessor 'com.github.reportportal:plugin-api:develop-SNAPSHOT'
     }
 
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
+
     hello("com.apollographql.apollo3:apollo-runtime:3.8.2")
-    hello("com.squareup.okhttp3:okhttp:4.9.3")
+    hello("com.squareup.okhttp3:okhttp:4.11.0")
 
     hello group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
 
@@ -57,7 +61,7 @@ test {
     useJUnitPlatform()
     jacocoTestReport {
         reports {
-            xml.enabled true
+            xml.required = true
         }
     }
 }
@@ -173,7 +177,7 @@ task plugin(type: Jar) {
     into('lib') {
         from configurations.compileClasspath
     }
-    extension('zip')
+    archiveExtension.set('zip')
 }
 
 task assemblePlugin(type: Copy) {
