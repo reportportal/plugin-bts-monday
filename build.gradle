@@ -10,7 +10,7 @@ plugins {
 apply from: 'project-properties.gradle'
 
 def scriptsUrl = 'https://raw.githubusercontent.com/reportportal/gradle-scripts/' +
-        (releaseMode ? getProperty('scripts.version') : 'java-21')
+        (releaseMode ? getProperty('scripts.version') : 'develop')
 
 apply from: 'ui.gradle'
 apply from: scriptsUrl + '/release-fat.gradle'
