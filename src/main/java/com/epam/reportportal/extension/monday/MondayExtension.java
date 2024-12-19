@@ -55,6 +55,7 @@ import com.epam.ta.reportportal.dao.LogRepository;
 import com.epam.ta.reportportal.dao.ProjectRepository;
 import com.epam.ta.reportportal.dao.TestItemRepository;
 import com.epam.ta.reportportal.dao.TicketRepository;
+import com.epam.ta.reportportal.dao.organization.OrganizationRepositoryCustom;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -110,6 +111,8 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
   private TicketRepository ticketRepository;
   @Autowired
   private ProjectRepository projectRepository;
+  @Autowired
+  private OrganizationRepositoryCustom organizationRepository;
   @Autowired
   private LogRepository logRepository;
   @Autowired
@@ -251,13 +254,14 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
   private Map<String, PluginCommand<?>> getCommands() {
     List<PluginCommand<?>> commands = new ArrayList<>();
     commands.add(new TestConnectionCommand(mondayClientProvider.get()));
-    commands.add(new GetIssueTypesCommand(projectRepository));
+    commands.add(new GetIssueTypesCommand(projectRepository, organizationRepository));
     commands.add(
-        new GetIssueFieldsCommand(projectRepository, mondayClientProvider.get(), objectMapper));
+        new GetIssueFieldsCommand(projectRepository, mondayClientProvider.get(), objectMapper,
+            organizationRepository));
     commands.add(
         new PostTicketCommand(projectRepository, requestEntityConverter, mondayClientProvider.get(),
             issueParamsConverter, issueDescriptionProvider, logSenderProviderSupplier.get(),
-            objectMapper, testItemRepository, logRepository
+            objectMapper, testItemRepository, logRepository, organizationRepository
         ));
     return commands.stream().collect(Collectors.toMap(NamedPluginCommand::getName, it -> it));
 

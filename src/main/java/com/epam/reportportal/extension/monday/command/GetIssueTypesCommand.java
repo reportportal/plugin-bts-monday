@@ -18,6 +18,7 @@ package com.epam.reportportal.extension.monday.command;
 
 import com.epam.reportportal.extension.ProjectManagerCommand;
 import com.epam.ta.reportportal.dao.ProjectRepository;
+import com.epam.ta.reportportal.dao.organization.OrganizationRepositoryCustom;
 import com.epam.ta.reportportal.entity.integration.Integration;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +28,9 @@ import java.util.Map;
  */
 public class GetIssueTypesCommand extends ProjectManagerCommand<List<String>> {
 
-  public GetIssueTypesCommand(ProjectRepository projectRepository) {
-    super(projectRepository);
+  public GetIssueTypesCommand(ProjectRepository projectRepository,
+      OrganizationRepositoryCustom organizationRepository) {
+    super(projectRepository, organizationRepository);
   }
 
   @Override
