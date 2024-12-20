@@ -29,7 +29,7 @@ configurations {
 
 dependencyManagement {
     imports {
-        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:5.12.1' : 'com.epam.reportportal:commons-bom:5.12.1')
+        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:5.13.0' : 'com.epam.reportportal:commons-bom:5.13.0')
     }
 }
 
@@ -46,6 +46,7 @@ dependencies {
     }
 
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
+    implementation('org.hibernate:hibernate-core:5.4.18.Final')
 
     hello("com.apollographql.apollo3:apollo-runtime:3.8.2")
     hello("com.squareup.okhttp3:okhttp:4.11.0")
@@ -118,7 +119,6 @@ jar {
 }
 
 shadowJar {
-    archiveClassifier.set(null)
     from("src/main/resources") {
         into("/resources")
     }
