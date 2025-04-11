@@ -64,10 +64,16 @@ public class TestConnectionCommand implements PluginCommand<Boolean> {
     verifyBoardId(boardId);
 
     MondayClient mondayClient = mondayClientProvider.provide(integrationParams);
+    try {
+      return mondayClient.getBoard(boardId)
+          .map(b -> Boolean.TRUE)
+          .orElseThrow(() -> new ReportPortalException(UNABLE_INTERACT_WITH_INTEGRATION, "Board with provided id {} not found", boardId));
+    } catch (ReportPortalException rpe) {
+      throw rpe;
+    } catch (Exception e) {
+      throw new ReportPortalException(UNABLE_INTERACT_WITH_INTEGRATION, e.getMessage());
+    }
 
-    return mondayClient.getBoard(boardId).map(b -> Boolean.TRUE).orElseThrow(
-        () -> new ReportPortalException(UNABLE_INTERACT_WITH_INTEGRATION,
-            "Board with provided id {} not found", boardId));
   }
 
   private void verifyBoardId(String boardId) {
