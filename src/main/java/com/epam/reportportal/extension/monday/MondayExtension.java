@@ -68,7 +68,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.jasypt.util.text.BasicTextEncryptor;
