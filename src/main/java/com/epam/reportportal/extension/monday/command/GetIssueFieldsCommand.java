@@ -28,6 +28,7 @@ import com.epam.reportportal.extension.monday.model.payload.BoardSettings;
 import com.epam.reportportal.model.externalsystem.AllowedValue;
 import com.epam.reportportal.model.externalsystem.PostFormField;
 import com.epam.ta.reportportal.dao.ProjectRepository;
+import com.epam.ta.reportportal.dao.organization.OrganizationRepositoryCustom;
 import com.epam.ta.reportportal.entity.integration.Integration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,8 +57,9 @@ public class GetIssueFieldsCommand extends ProjectManagerCommand<List<PostFormFi
   private final ObjectMapper objectMapper;
 
   public GetIssueFieldsCommand(ProjectRepository projectRepository,
-      MondayClientProvider mondayClientProvider, ObjectMapper objectMapper) {
-    super(projectRepository);
+      MondayClientProvider mondayClientProvider, ObjectMapper objectMapper,
+      OrganizationRepositoryCustom organizationRepository) {
+    super(projectRepository, organizationRepository);
     this.mondayClientProvider = mondayClientProvider;
     this.objectMapper = objectMapper;
   }

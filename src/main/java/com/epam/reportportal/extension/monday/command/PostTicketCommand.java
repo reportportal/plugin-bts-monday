@@ -42,6 +42,7 @@ import com.epam.reportportal.rules.exception.ReportPortalException;
 import com.epam.ta.reportportal.dao.LogRepository;
 import com.epam.ta.reportportal.dao.ProjectRepository;
 import com.epam.ta.reportportal.dao.TestItemRepository;
+import com.epam.ta.reportportal.dao.organization.OrganizationRepositoryCustom;
 import com.epam.ta.reportportal.entity.integration.Integration;
 import com.epam.ta.reportportal.entity.log.Log;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -77,8 +78,9 @@ public class PostTicketCommand extends ProjectMemberCommand<Ticket> {
       RequestEntityConverter requestEntityConverter, MondayClientProvider mondayClientProvider,
       IssueParamsConverter issueParamsConverter, IssueDescriptionProvider issueDescriptionProvider,
       LogSenderProvider logSenderProvider, ObjectMapper objectMapper,
-      TestItemRepository testItemRepository, LogRepository logRepository) {
-    super(projectRepository);
+      TestItemRepository testItemRepository, LogRepository logRepository,
+      OrganizationRepositoryCustom organizationRepository) {
+    super(projectRepository, organizationRepository);
     this.requestEntityConverter = requestEntityConverter;
     this.mondayClientProvider = mondayClientProvider;
     this.issueParamsConverter = issueParamsConverter;
