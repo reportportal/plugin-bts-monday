@@ -42,7 +42,7 @@ public class GraphQLExecutor implements Closeable {
       });
     } catch (InterruptedException e) {
       LOGGER.error(e.getMessage(), e);
-      throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, e.getMessage());
+      throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION);
     }
   }
 
@@ -60,7 +60,7 @@ public class GraphQLExecutor implements Closeable {
       });
     } catch (InterruptedException e) {
       LOGGER.error(e.getMessage(), e);
-      throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, e.getMessage());
+      throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION);
     }
   }
 
