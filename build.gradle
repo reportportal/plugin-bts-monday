@@ -29,7 +29,7 @@ configurations {
 
 dependencyManagement {
     imports {
-        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:5.13.0' : 'com.epam.reportportal:commons-bom:5.13.0')
+        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:5.14.3' : 'com.epam.reportportal:commons-bom:5.14.3')
     }
 }
 
@@ -38,11 +38,11 @@ ext['spring-boot.version'] = "${springBootVersion}"
 dependencies {
 
     if (releaseMode) {
-        implementation 'com.github.reportportal:commons-dao:71ef80c'
+        implementation 'com.epam.reportportal:commons-dao'
         implementation 'com.epam.reportportal:plugin-api'
         annotationProcessor 'com.epam.reportportal:plugin-api'
     } else {
-        implementation 'com.github.reportportal:commons-dao:71ef80c'
+        implementation 'com.epam.reportportal:commons-dao'
         implementation 'com.epam.reportportal:plugin-api'
         annotationProcessor 'com.epam.reportportal:plugin-api'
     }
