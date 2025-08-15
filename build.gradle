@@ -38,13 +38,13 @@ ext['spring-boot.version'] = "${springBootVersion}"
 dependencies {
 
     if (releaseMode) {
-        implementation 'com.epam.reportportal:commons-dao'
-        implementation("com.epam.reportportal:plugin-api")
+        implementation 'com.github.reportportal:commons-dao:71ef80c'
+        implementation 'com.epam.reportportal:plugin-api'
         annotationProcessor 'com.epam.reportportal:plugin-api'
     } else {
-        implementation 'com.github.reportportal:commons-dao:68aa99a'
-        implementation 'com.github.reportportal:plugin-api:8874441'
-        annotationProcessor 'com.github.reportportal:plugin-api:8874441'
+        implementation 'com.github.reportportal:commons-dao:71ef80c'
+        implementation 'com.epam.reportportal:plugin-api'
+        annotationProcessor 'com.epam.reportportal:plugin-api'
     }
 
     hello("com.apollographql.apollo3:apollo-runtime:3.8.2")
