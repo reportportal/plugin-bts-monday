@@ -71,7 +71,7 @@ public class TestConnectionCommand implements PluginCommand<Boolean> {
     } catch (ReportPortalException rpe) {
       throw rpe;
     } catch (Exception e) {
-      throw new ReportPortalException(UNABLE_INTERACT_WITH_INTEGRATION, e.getMessage());
+      throw new ReportPortalException(UNABLE_INTERACT_WITH_INTEGRATION);
     }
 
   }
