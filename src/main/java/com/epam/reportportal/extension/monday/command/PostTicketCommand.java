@@ -17,10 +17,10 @@
 package com.epam.reportportal.extension.monday.command;
 
 import static com.epam.reportportal.extension.util.CommandParamUtils.ENTITY_PARAM;
-import static com.epam.reportportal.rules.commons.validation.BusinessRule.expect;
-import static com.epam.ta.reportportal.commons.Predicates.isNull;
-import static com.epam.ta.reportportal.commons.Predicates.not;
+import static com.epam.reportportal.infrastructure.persistence.commons.Predicates.isNull;
+import static com.epam.reportportal.infrastructure.rules.commons.validation.BusinessRule.expect;
 import static java.util.Optional.ofNullable;
+import static java.util.function.Predicate.not;
 
 import com.epam.reportportal.extension.ProjectMemberCommand;
 import com.epam.reportportal.extension.monday.client.MondayClient;
@@ -33,18 +33,18 @@ import com.epam.reportportal.extension.monday.service.issue.log.sender.LogSender
 import com.epam.reportportal.extension.monday.service.issue.log.sender.LogSenderProvider;
 import com.epam.reportportal.extension.util.RequestEntityConverter;
 import com.epam.reportportal.extension.util.RequestEntityValidator;
-import com.epam.reportportal.model.externalsystem.PostFormField;
-import com.epam.reportportal.model.externalsystem.PostTicketRQ;
-import com.epam.reportportal.model.externalsystem.Ticket;
-import com.epam.reportportal.rules.commons.validation.Suppliers;
-import com.epam.reportportal.rules.exception.ErrorType;
-import com.epam.reportportal.rules.exception.ReportPortalException;
-import com.epam.ta.reportportal.dao.LogRepository;
-import com.epam.ta.reportportal.dao.ProjectRepository;
-import com.epam.ta.reportportal.dao.TestItemRepository;
-import com.epam.ta.reportportal.dao.organization.OrganizationRepositoryCustom;
-import com.epam.ta.reportportal.entity.integration.Integration;
-import com.epam.ta.reportportal.entity.log.Log;
+import com.epam.reportportal.infrastructure.model.externalsystem.PostFormField;
+import com.epam.reportportal.infrastructure.model.externalsystem.PostTicketRQ;
+import com.epam.reportportal.infrastructure.model.externalsystem.Ticket;
+import com.epam.reportportal.infrastructure.rules.commons.validation.Suppliers;
+import com.epam.reportportal.infrastructure.rules.exception.ErrorType;
+import com.epam.reportportal.infrastructure.rules.exception.ReportPortalException;
+import com.epam.reportportal.infrastructure.persistence.dao.LogRepository;
+import com.epam.reportportal.infrastructure.persistence.dao.ProjectRepository;
+import com.epam.reportportal.infrastructure.persistence.dao.TestItemRepository;
+import com.epam.reportportal.infrastructure.persistence.dao.organization.OrganizationRepositoryCustom;
+import com.epam.reportportal.infrastructure.persistence.entity.integration.Integration;
+import com.epam.reportportal.infrastructure.persistence.entity.log.Log;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;

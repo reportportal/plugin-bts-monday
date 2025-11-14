@@ -17,9 +17,9 @@
 package com.epam.reportportal.extension.monday.command;
 
 import com.epam.reportportal.extension.ProjectManagerCommand;
-import com.epam.ta.reportportal.dao.ProjectRepository;
-import com.epam.ta.reportportal.dao.organization.OrganizationRepositoryCustom;
-import com.epam.ta.reportportal.entity.integration.Integration;
+import com.epam.reportportal.infrastructure.persistence.dao.ProjectRepository;
+import com.epam.reportportal.infrastructure.persistence.dao.organization.OrganizationRepositoryCustom;
+import com.epam.reportportal.infrastructure.persistence.entity.integration.Integration;
 import java.util.List;
 import java.util.Map;
 
