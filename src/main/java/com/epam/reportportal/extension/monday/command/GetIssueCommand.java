@@ -23,14 +23,14 @@ import com.epam.reportportal.extension.monday.client.MondayClient;
 import com.epam.reportportal.extension.monday.client.MondayClientProvider;
 import com.epam.reportportal.extension.monday.model.enums.MondayProperties;
 import com.epam.reportportal.extension.monday.model.graphql.GetItemsQuery;
-import com.epam.reportportal.model.externalsystem.Ticket;
-import com.epam.reportportal.rules.commons.validation.Suppliers;
-import com.epam.reportportal.rules.exception.ErrorType;
-import com.epam.reportportal.rules.exception.ReportPortalException;
-import com.epam.ta.reportportal.dao.IntegrationRepository;
-import com.epam.ta.reportportal.dao.TicketRepository;
-import com.epam.ta.reportportal.entity.integration.Integration;
-import com.epam.ta.reportportal.entity.integration.IntegrationParams;
+import com.epam.reportportal.infrastructure.model.externalsystem.Ticket;
+import com.epam.reportportal.infrastructure.rules.commons.validation.Suppliers;
+import com.epam.reportportal.infrastructure.rules.exception.ErrorType;
+import com.epam.reportportal.infrastructure.rules.exception.ReportPortalException;
+import com.epam.reportportal.infrastructure.persistence.dao.IntegrationRepository;
+import com.epam.reportportal.infrastructure.persistence.dao.TicketRepository;
+import com.epam.reportportal.infrastructure.persistence.entity.integration.Integration;
+import com.epam.reportportal.infrastructure.persistence.entity.integration.IntegrationParams;
 import java.util.Map;
 import java.util.Objects;
 import org.slf4j.Logger;
@@ -60,7 +60,7 @@ public class GetIssueCommand implements CommonPluginCommand<Ticket> {
 
   @Override
   public Ticket executeCommand(Map<String, Object> params) {
-    final com.epam.ta.reportportal.entity.bts.Ticket ticket = ticketRepository.findByTicketId(
+    var ticket = ticketRepository.findByTicketId(
         (String) ofNullable(params.get(TICKET_ID)).orElseThrow(
             () -> new ReportPortalException(ErrorType.BAD_REQUEST_ERROR,
                 TICKET_ID + " must be provided"

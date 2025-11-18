@@ -1,10 +1,10 @@
 package com.epam.reportportal.extension.monday.service.issue;
 
-import static com.epam.reportportal.rules.commons.validation.Suppliers.formattedSupplier;
+import static com.epam.reportportal.infrastructure.rules.commons.validation.Suppliers.formattedSupplier;
 import static java.util.Optional.ofNullable;
 
-import com.epam.reportportal.model.externalsystem.PostTicketRQ;
-import com.epam.ta.reportportal.entity.item.TestItem;
+import com.epam.reportportal.infrastructure.model.externalsystem.PostTicketRQ;
+import com.epam.reportportal.infrastructure.persistence.entity.item.TestItem;
 import org.apache.commons.lang3.StringUtils;
 
 public class IssueDescriptionProvider {

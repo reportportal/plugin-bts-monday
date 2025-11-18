@@ -21,8 +21,8 @@ import com.epam.reportportal.extension.monday.event.EventHandlerFactory;
 import com.epam.reportportal.extension.monday.event.handler.EventHandler;
 import com.epam.reportportal.extension.monday.event.handler.plugin.PluginLoadedEventHandler;
 import com.epam.reportportal.extension.monday.info.PluginInfoProvider;
-import com.epam.ta.reportportal.dao.IntegrationRepository;
-import com.epam.ta.reportportal.dao.IntegrationTypeRepository;
+import com.epam.reportportal.infrastructure.persistence.dao.IntegrationRepository;
+import com.epam.reportportal.infrastructure.persistence.dao.IntegrationTypeRepository;
 import java.util.HashMap;
 import java.util.Map;
 
