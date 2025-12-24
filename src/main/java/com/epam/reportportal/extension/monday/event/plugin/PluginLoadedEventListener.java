@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.epam.reportportal.extension.monday.event.handler.plugin;
+package com.epam.reportportal.extension.monday.event.plugin;
 
-import com.epam.reportportal.extension.event.PluginEvent;
-import com.epam.reportportal.extension.monday.event.handler.EventHandler;
+import com.epam.reportportal.core.events.domain.PluginUploadedEvent;
 import com.epam.reportportal.extension.monday.info.PluginInfoProvider;
 import com.epam.reportportal.infrastructure.persistence.dao.IntegrationRepository;
 import com.epam.reportportal.infrastructure.persistence.dao.IntegrationTypeRepository;
@@ -25,29 +24,43 @@ import com.epam.reportportal.infrastructure.persistence.entity.integration.Integ
 import com.epam.reportportal.infrastructure.persistence.entity.integration.IntegrationParams;
 import com.epam.reportportal.infrastructure.persistence.entity.integration.IntegrationType;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import org.springframework.context.ApplicationListener;
 
-public class PluginLoadedEventHandler implements EventHandler<PluginEvent> {
+public class PluginLoadedEventListener implements ApplicationListener<PluginUploadedEvent> {
 
+  private final String pluginId;
   private final IntegrationTypeRepository integrationTypeRepository;
   private final IntegrationRepository integrationRepository;
   private final PluginInfoProvider pluginInfoProvider;
 
-  public PluginLoadedEventHandler(IntegrationTypeRepository integrationTypeRepository,
+  public PluginLoadedEventListener(String pluginId,
+      IntegrationTypeRepository integrationTypeRepository,
       IntegrationRepository integrationRepository, PluginInfoProvider pluginInfoProvider) {
+    this.pluginId = pluginId;
     this.integrationTypeRepository = integrationTypeRepository;
     this.integrationRepository = integrationRepository;
     this.pluginInfoProvider = pluginInfoProvider;
   }
 
   @Override
-  public void handle(PluginEvent event) {
-    integrationTypeRepository.findByName(event.getPluginId()).ifPresent(integrationType -> {
-      createIntegration(event.getPluginId(), integrationType);
+  public void onApplicationEvent(PluginUploadedEvent event) {
+    if (!supports(event)) {
+      return;
+    }
+
+    String eventPluginId = event.getPluginActivityResource().getName();
+    integrationTypeRepository.findByName(eventPluginId).ifPresent(integrationType -> {
+      createIntegration(eventPluginId, integrationType);
       integrationTypeRepository.save(pluginInfoProvider.provide(integrationType));
     });
+  }
+
+  private boolean supports(PluginUploadedEvent event) {
+    return Objects.nonNull(event.getPluginActivityResource())
+        && pluginId.equals(event.getPluginActivityResource().getName());
   }
 
   private void createIntegration(String name, IntegrationType integrationType) {
@@ -63,5 +76,4 @@ public class PluginLoadedEventHandler implements EventHandler<PluginEvent> {
       integrationRepository.save(integration);
     }
   }
-
 }

@@ -34,8 +34,8 @@ dependencies {
         implementation 'com.epam.reportportal:service-api'
         annotationProcessor 'com.epam.reportportal:service-api'
     } else {
-        implementation 'com.github.reportportal:service-api:3e34a90'
-        annotationProcessor 'com.github.reportportal:service-api:3e34a90'
+        implementation 'com.github.reportportal:service-api:4a137a7'
+        annotationProcessor 'com.github.reportportal:service-api:4a137a7'
     }
 
     hello("com.apollographql.apollo3:apollo-runtime:3.8.2")

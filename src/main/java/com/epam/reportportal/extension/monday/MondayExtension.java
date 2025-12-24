@@ -18,13 +18,13 @@ package com.epam.reportportal.extension.monday;
 
 import com.apollographql.apollo3.ApolloClient;
 import com.apollographql.apollo3.network.http.DefaultHttpEngine;
+import com.epam.reportportal.core.events.domain.PluginUploadedEvent;
 import com.epam.reportportal.extension.CommonPluginCommand;
 import com.epam.reportportal.extension.IntegrationGroupEnum;
 import com.epam.reportportal.extension.NamedPluginCommand;
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.ReportPortalExtensionPoint;
 import com.epam.reportportal.extension.common.IntegrationTypeProperties;
-import com.epam.reportportal.extension.event.PluginEvent;
 import com.epam.reportportal.extension.monday.client.GraphQLExecutor;
 import com.epam.reportportal.extension.monday.client.MondayClientProvider;
 import com.epam.reportportal.extension.monday.command.GetIssueCommand;
@@ -34,8 +34,7 @@ import com.epam.reportportal.extension.monday.command.PostTicketCommand;
 import com.epam.reportportal.extension.monday.command.RetrieveCreationParamsCommand;
 import com.epam.reportportal.extension.monday.command.RetrieveUpdateParamsCommand;
 import com.epam.reportportal.extension.monday.command.connection.TestConnectionCommand;
-import com.epam.reportportal.extension.monday.event.plugin.PluginEventHandlerFactory;
-import com.epam.reportportal.extension.monday.event.plugin.PluginEventListener;
+import com.epam.reportportal.extension.monday.event.plugin.PluginLoadedEventListener;
 import com.epam.reportportal.extension.monday.info.impl.PluginInfoProviderImpl;
 import com.epam.reportportal.extension.monday.model.enums.MondayColumnType;
 import com.epam.reportportal.extension.monday.service.column.converter.DefaultColumnConverter;
@@ -100,7 +99,7 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
   private final Supplier<GraphQLExecutor> graphQLExecutor;
   private final Supplier<MondayClientProvider> mondayClientProvider;
   private final Supplier<LogSenderProvider> logSenderProviderSupplier;
-  private final Supplier<ApplicationListener<PluginEvent>> pluginLoadedListenerSupplier;
+  private final Supplier<ApplicationListener<PluginUploadedEvent>> pluginLoadedListenerSupplier;
   @Autowired
   private ApplicationContext applicationContext;
   @Autowired
@@ -133,10 +132,9 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
             .orElse("");
     objectMapper = configureObjectMapper();
 
-    pluginLoadedListenerSupplier = new MemoizingSupplier<>(() -> new PluginEventListener(PLUGIN_ID,
-        new PluginEventHandlerFactory(integrationTypeRepository, integrationRepository,
-            new PluginInfoProviderImpl(resourcesDir, BINARY_DATA_PROPERTIES_FILE_ID)
-        )
+    pluginLoadedListenerSupplier = new MemoizingSupplier<>(() -> new PluginLoadedEventListener(
+        PLUGIN_ID, integrationTypeRepository, integrationRepository,
+        new PluginInfoProviderImpl(resourcesDir, BINARY_DATA_PROPERTIES_FILE_ID)
     ));
 
     requestEntityConverter = new RequestEntityConverter(objectMapper);
