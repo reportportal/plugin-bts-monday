@@ -16,8 +16,7 @@
 
 package com.epam.reportportal.extension.monday;
 
-import com.apollographql.apollo3.ApolloClient;
-import com.apollographql.apollo3.network.http.DefaultHttpEngine;
+import com.apollographql.java.client.ApolloClient;
 import com.epam.reportportal.core.events.domain.PluginUploadedEvent;
 import com.epam.reportportal.extension.CommonPluginCommand;
 import com.epam.reportportal.extension.IntegrationGroupEnum;
@@ -169,7 +168,8 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
   }
 
   private ApolloClient configureApolloClient(OkHttpClient okHttpClient) {
-    return new ApolloClient.Builder().httpEngine(new DefaultHttpEngine(okHttpClient))
+    return new ApolloClient.Builder()
+        .okHttpClient(okHttpClient)
         .serverUrl(MONDAY_GRAPHQL_URL).build();
   }
 

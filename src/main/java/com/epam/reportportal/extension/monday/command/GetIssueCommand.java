@@ -24,27 +24,23 @@ import com.epam.reportportal.extension.monday.client.MondayClientProvider;
 import com.epam.reportportal.extension.monday.model.enums.MondayProperties;
 import com.epam.reportportal.extension.monday.model.graphql.GetItemsQuery;
 import com.epam.reportportal.infrastructure.model.externalsystem.Ticket;
-import com.epam.reportportal.infrastructure.rules.commons.validation.Suppliers;
-import com.epam.reportportal.infrastructure.rules.exception.ErrorType;
-import com.epam.reportportal.infrastructure.rules.exception.ReportPortalException;
 import com.epam.reportportal.infrastructure.persistence.dao.IntegrationRepository;
 import com.epam.reportportal.infrastructure.persistence.dao.TicketRepository;
 import com.epam.reportportal.infrastructure.persistence.entity.integration.Integration;
 import com.epam.reportportal.infrastructure.persistence.entity.integration.IntegrationParams;
+import com.epam.reportportal.infrastructure.rules.commons.validation.Suppliers;
+import com.epam.reportportal.infrastructure.rules.exception.ErrorType;
+import com.epam.reportportal.infrastructure.rules.exception.ReportPortalException;
 import java.util.Map;
 import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
 public class GetIssueCommand implements CommonPluginCommand<Ticket> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(GetIssueCommand.class);
-
-  private final String TICKET_ID = "ticketId";
-  private final String PROJECT_ID = "projectId";
+  private static final String TICKET_ID = "ticketId";
+  private static final String PROJECT_ID = "projectId";
 
   private final MondayClientProvider mondayClientProvider;
 
