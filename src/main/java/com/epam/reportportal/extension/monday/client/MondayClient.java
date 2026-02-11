@@ -2,7 +2,7 @@ package com.epam.reportportal.extension.monday.client;
 
 import static java.util.Optional.ofNullable;
 
-import com.apollographql.apollo3.api.Optional;
+import com.apollographql.apollo.api.Optional;
 import com.epam.reportportal.extension.monday.model.graphql.CreateIssueMutation;
 import com.epam.reportportal.extension.monday.model.graphql.CreateIssueUpdateSectionMutation;
 import com.epam.reportportal.extension.monday.model.graphql.GetBoardConfigQuery;
@@ -46,9 +46,7 @@ public class MondayClient {
 
   public java.util.Optional<CreateIssueMutation.Create_item> createItem(String boardId, String name,
       String columns) {
-    CreateIssueMutation createIssueMutation = new CreateIssueMutation(boardId, name,
-        com.apollographql.apollo3.api.Optional.present(columns)
-    );
+    CreateIssueMutation createIssueMutation = new CreateIssueMutation(boardId, name, Optional.present(columns));
     CreateIssueMutation.Data data = graphQLExecutor.mutation(createIssueMutation, token);
     return ofNullable(data.create_item);
   }
@@ -70,7 +68,8 @@ public class MondayClient {
   }
 
   /**
-   * File upload made without Apollo client because of a bunch of unresolved errors that occur when UploadAdapter from GraphQL is used
+   * File upload made without Apollo client because of a bunch of unresolved errors that occur when UploadAdapter from
+   * GraphQL is used
    */
   public boolean uploadFile(String parentId, InputStream inputStream, String fileName,
       String contentType) throws IOException {
