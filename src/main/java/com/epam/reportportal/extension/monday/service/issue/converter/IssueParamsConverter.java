@@ -2,7 +2,7 @@ package com.epam.reportportal.extension.monday.service.issue.converter;
 
 import com.epam.reportportal.extension.monday.model.enums.MondayColumnId;
 import com.epam.reportportal.extension.monday.service.column.converter.IssueColumnConverter;
-import com.epam.reportportal.infrastructure.model.externalsystem.PostFormField;
+import com.epam.reportportal.base.infrastructure.model.externalsystem.PostFormField;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

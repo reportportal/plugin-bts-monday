@@ -18,6 +18,7 @@ apply from: scriptsUrl + '/signing.gradle'
 
 repositories {
     mavenCentral { url = "https://repo1.maven.org/maven2" }
+    maven { url = "https://build.shibboleth.net/nexus/content/repositories/releases/" }
     if (!releaseMode) {
         maven { url = 'https://jitpack.io' }
     }
@@ -34,8 +35,8 @@ dependencies {
         implementation 'com.epam.reportportal:service-api'
         annotationProcessor 'com.epam.reportportal:service-api'
     } else {
-        implementation 'com.github.reportportal:service-api:7044a29'
-        annotationProcessor 'com.github.reportportal:service-api:7044a29'
+        implementation 'com.github.reportportal:service-api:e81b4f6'
+        annotationProcessor 'com.github.reportportal:service-api:e81b4f6'
     }
 
     hello("com.apollographql.java:client:0.0.2")
