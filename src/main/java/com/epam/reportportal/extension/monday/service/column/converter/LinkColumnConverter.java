@@ -1,6 +1,6 @@
 package com.epam.reportportal.extension.monday.service.column.converter;
 
-import com.epam.reportportal.infrastructure.model.externalsystem.PostFormField;
+import com.epam.reportportal.base.infrastructure.model.externalsystem.PostFormField;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 

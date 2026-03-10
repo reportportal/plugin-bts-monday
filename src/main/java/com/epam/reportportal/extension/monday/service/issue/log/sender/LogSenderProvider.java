@@ -1,7 +1,7 @@
 package com.epam.reportportal.extension.monday.service.issue.log.sender;
 
 import com.epam.reportportal.extension.monday.client.MondayClient;
-import com.epam.reportportal.infrastructure.persistence.binary.DataStoreService;
+import com.epam.reportportal.base.infrastructure.persistence.binary.DataStoreService;
 
 public class LogSenderProvider {
 

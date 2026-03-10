@@ -1,7 +1,7 @@
 package com.epam.reportportal.extension.monday.client;
 
 import com.epam.reportportal.extension.monday.model.enums.MondayProperties;
-import com.epam.reportportal.infrastructure.persistence.entity.integration.IntegrationParams;
+import com.epam.reportportal.base.infrastructure.persistence.entity.integration.IntegrationParams;
 import okhttp3.OkHttpClient;
 import org.jasypt.util.text.BasicTextEncryptor;
 

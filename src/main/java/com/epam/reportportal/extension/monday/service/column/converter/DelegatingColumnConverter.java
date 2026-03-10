@@ -3,7 +3,7 @@ package com.epam.reportportal.extension.monday.service.column.converter;
 import static java.util.Optional.ofNullable;
 
 import com.epam.reportportal.extension.monday.model.enums.MondayColumnType;
-import com.epam.reportportal.infrastructure.model.externalsystem.PostFormField;
+import com.epam.reportportal.base.infrastructure.model.externalsystem.PostFormField;
 import java.util.Map;
 import java.util.Optional;
 

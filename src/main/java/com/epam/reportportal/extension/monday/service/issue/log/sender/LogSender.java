@@ -1,17 +1,17 @@
 package com.epam.reportportal.extension.monday.service.issue.log.sender;
 
-import static com.epam.reportportal.infrastructure.persistence.commons.EntityUtils.INSTANT_TO_LDT;
-import static com.epam.reportportal.infrastructure.rules.commons.validation.Suppliers.formattedSupplier;
+import static com.epam.reportportal.base.infrastructure.persistence.commons.EntityUtils.INSTANT_TO_LDT;
+import static com.epam.reportportal.base.infrastructure.rules.commons.validation.Suppliers.formattedSupplier;
 import static java.util.Optional.ofNullable;
 
 import com.epam.reportportal.extension.monday.client.MondayClient;
 import com.epam.reportportal.extension.monday.command.PostTicketCommand;
-import com.epam.reportportal.infrastructure.model.externalsystem.PostTicketRQ;
-import com.epam.reportportal.infrastructure.persistence.binary.DataStoreService;
-import com.epam.reportportal.infrastructure.persistence.entity.attachment.Attachment;
-import com.epam.reportportal.infrastructure.persistence.entity.log.Log;
-import com.epam.reportportal.infrastructure.rules.exception.ErrorType;
-import com.epam.reportportal.infrastructure.rules.exception.ReportPortalException;
+import com.epam.reportportal.base.infrastructure.model.externalsystem.PostTicketRQ;
+import com.epam.reportportal.base.infrastructure.persistence.binary.DataStoreService;
+import com.epam.reportportal.base.infrastructure.persistence.entity.attachment.Attachment;
+import com.epam.reportportal.base.infrastructure.persistence.entity.log.Log;
+import com.epam.reportportal.base.infrastructure.rules.exception.ErrorType;
+import com.epam.reportportal.base.infrastructure.rules.exception.ReportPortalException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.format.DateTimeFormatter;

@@ -17,11 +17,11 @@
 package com.epam.reportportal.extension.monday.command;
 
 import static com.epam.reportportal.extension.monday.utils.ParamUtils.normalizeUrl;
-import static com.epam.reportportal.infrastructure.rules.commons.validation.BusinessRule.expect;
+import static com.epam.reportportal.base.infrastructure.rules.commons.validation.BusinessRule.expect;
 
 import com.epam.reportportal.extension.CommonPluginCommand;
 import com.epam.reportportal.extension.monday.model.enums.MondayProperties;
-import com.epam.reportportal.infrastructure.rules.exception.ErrorType;
+import com.epam.reportportal.base.infrastructure.rules.exception.ErrorType;
 import com.google.common.collect.Maps;
 import java.util.Map;
 import org.apache.commons.collections4.MapUtils;
