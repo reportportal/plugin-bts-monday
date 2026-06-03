@@ -18,33 +18,43 @@ package com.epam.reportportal.extension.monday.command;
 
 import static java.util.Optional.ofNullable;
 
-import com.epam.reportportal.extension.ProjectManagerCommand;
+import com.epam.reportportal.api.model.PluginCommandRQ;
+import com.epam.reportportal.base.infrastructure.model.externalsystem.AllowedValue;
+import com.epam.reportportal.base.infrastructure.model.externalsystem.PostFormField;
+import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationRepositoryCustom;
+import com.epam.reportportal.base.infrastructure.persistence.entity.integration.Integration;
+import com.epam.reportportal.base.infrastructure.persistence.entity.organization.OrganizationRole;
+import com.epam.reportportal.base.infrastructure.persistence.entity.project.ProjectRole;
+import com.epam.reportportal.base.infrastructure.persistence.entity.user.UserRole;
+import com.epam.reportportal.extension.command.AbstractExtensionCommand;
 import com.epam.reportportal.extension.monday.client.MondayClient;
 import com.epam.reportportal.extension.monday.client.MondayClientProvider;
 import com.epam.reportportal.extension.monday.model.enums.MondayProperties;
 import com.epam.reportportal.extension.monday.model.graphql.GetBoardConfigQuery;
 import com.epam.reportportal.extension.monday.model.graphql.type.ColumnType;
 import com.epam.reportportal.extension.monday.model.payload.BoardSettings;
-import com.epam.reportportal.base.infrastructure.model.externalsystem.AllowedValue;
-import com.epam.reportportal.base.infrastructure.model.externalsystem.PostFormField;
-import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectRepository;
-import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationRepositoryCustom;
-import com.epam.reportportal.base.infrastructure.persistence.entity.integration.Integration;
+import com.epam.reportportal.extension.util.RequestEntityConverter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
-public class GetIssueFieldsCommand extends ProjectManagerCommand<List<PostFormField>> {
+@Slf4j
+public class GetIssueFieldsCommand extends AbstractExtensionCommand<List<PostFormField>> {
+
+  private final ProjectRole minProjectRole = ProjectRole.EDITOR;
+  private final OrganizationRole minOrgRole = OrganizationRole.MANAGER;
+  private final UserRole minUserRole = UserRole.ADMINISTRATOR;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GetIssueFieldsCommand.class);
 
@@ -70,7 +80,7 @@ public class GetIssueFieldsCommand extends ProjectManagerCommand<List<PostFormFi
   }
 
   @Override
-  protected List<PostFormField> invokeCommand(Integration integration, Map<String, Object> params) {
+  protected List<PostFormField> invokeCommand(Integration integration, PluginCommandRQ pluginCommandRq) {
     String boardId = MondayProperties.PROJECT.getParam(integration.getParams());
 
     MondayClient mondayClient = mondayClientProvider.provide(integration.getParams());

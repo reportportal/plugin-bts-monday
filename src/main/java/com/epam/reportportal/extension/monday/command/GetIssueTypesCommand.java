@@ -16,17 +16,24 @@
 
 package com.epam.reportportal.extension.monday.command;
 
-import com.epam.reportportal.extension.ProjectManagerCommand;
+import com.epam.reportportal.api.model.PluginCommandRQ;
 import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectRepository;
 import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationRepositoryCustom;
 import com.epam.reportportal.base.infrastructure.persistence.entity.integration.Integration;
+import com.epam.reportportal.base.infrastructure.persistence.entity.organization.OrganizationRole;
+import com.epam.reportportal.base.infrastructure.persistence.entity.project.ProjectRole;
+import com.epam.reportportal.base.infrastructure.persistence.entity.user.UserRole;
+import com.epam.reportportal.extension.command.AbstractExtensionCommand;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
-public class GetIssueTypesCommand extends ProjectManagerCommand<List<String>> {
+public class GetIssueTypesCommand extends AbstractExtensionCommand<List<String>> {
+
+  private final ProjectRole minProjectRole = ProjectRole.EDITOR;
+  private final OrganizationRole minOrgRole = OrganizationRole.MANAGER;
+  private final UserRole minUserRole = UserRole.ADMINISTRATOR;
 
   public GetIssueTypesCommand(ProjectRepository projectRepository,
       OrganizationRepositoryCustom organizationRepository) {
@@ -39,7 +46,7 @@ public class GetIssueTypesCommand extends ProjectManagerCommand<List<String>> {
   }
 
   @Override
-  protected List<String> invokeCommand(Integration integration, Map<String, Object> params) {
+  protected List<String> invokeCommand(Integration integration, PluginCommandRQ pluginCommandRq) {
     return List.of();
   }
 }

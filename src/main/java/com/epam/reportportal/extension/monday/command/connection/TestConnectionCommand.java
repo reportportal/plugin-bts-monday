@@ -20,23 +20,34 @@ import static com.epam.reportportal.base.infrastructure.rules.exception.ErrorTyp
 import static com.epam.reportportal.base.infrastructure.rules.exception.ErrorType.UNABLE_INTERACT_WITH_INTEGRATION;
 import static java.util.Optional.ofNullable;
 
-import com.epam.reportportal.extension.PluginCommand;
+import com.epam.reportportal.api.model.PluginCommandRQ;
+import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationRepositoryCustom;
+import com.epam.reportportal.base.infrastructure.persistence.entity.integration.Integration;
+import com.epam.reportportal.base.infrastructure.persistence.entity.integration.IntegrationParams;
+import com.epam.reportportal.base.infrastructure.persistence.entity.organization.OrganizationRole;
+import com.epam.reportportal.base.infrastructure.persistence.entity.project.ProjectRole;
+import com.epam.reportportal.base.infrastructure.persistence.entity.user.UserRole;
+import com.epam.reportportal.base.infrastructure.rules.exception.ReportPortalException;
+import com.epam.reportportal.extension.command.AbstractExtensionCommand;
 import com.epam.reportportal.extension.monday.client.MondayClient;
 import com.epam.reportportal.extension.monday.client.MondayClientProvider;
 import com.epam.reportportal.extension.monday.model.enums.MondayProperties;
-import com.epam.reportportal.base.infrastructure.rules.exception.ReportPortalException;
-import com.epam.reportportal.base.infrastructure.persistence.entity.integration.Integration;
-import com.epam.reportportal.base.infrastructure.persistence.entity.integration.IntegrationParams;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
-public class TestConnectionCommand implements PluginCommand<Boolean> {
+public class TestConnectionCommand extends AbstractExtensionCommand<Boolean> {
+
+  private final ProjectRole minProjectRole = ProjectRole.EDITOR;
+  private final OrganizationRole minOrgRole = OrganizationRole.MANAGER;
+  private final UserRole minUserRole = UserRole.ADMINISTRATOR;
 
   private final MondayClientProvider mondayClientProvider;
 
-  public TestConnectionCommand(MondayClientProvider mondayClientProvider) {
+  public TestConnectionCommand(MondayClientProvider mondayClientProvider,
+      ProjectRepository projectRepository, OrganizationRepositoryCustom organizationRepository) {
+    super(projectRepository, organizationRepository);
     this.mondayClientProvider = mondayClientProvider;
   }
 
@@ -46,17 +57,16 @@ public class TestConnectionCommand implements PluginCommand<Boolean> {
   }
 
   @Override
-  public Boolean executeCommand(Integration integration, Map<String, Object> params) {
-    IntegrationParams integrationParams = ofNullable(integration.getParams()).orElseThrow(
-        () -> new ReportPortalException(UNABLE_INTERACT_WITH_INTEGRATION,
+  protected Boolean invokeCommand(Integration integration, PluginCommandRQ pluginCommandRq) {
+    IntegrationParams integrationParams = ofNullable(integration.getParams())
+        .orElseThrow(() -> new ReportPortalException(UNABLE_INTERACT_WITH_INTEGRATION,
             "Integration params are not specified."
         ));
 
     String url = MondayProperties.URL.getParam(integrationParams);
 
     if (!url.startsWith("https://") || !url.contains(".monday.com")) {
-      throw new ReportPortalException(UNABLE_INTERACT_WITH_INTEGRATION,
-          "Invalid URL.");
+      throw new ReportPortalException(UNABLE_INTERACT_WITH_INTEGRATION, "Invalid URL.");
     }
 
     String boardId = MondayProperties.PROJECT.getParam(integrationParams);
@@ -67,7 +77,9 @@ public class TestConnectionCommand implements PluginCommand<Boolean> {
     try {
       return mondayClient.getBoard(boardId)
           .map(b -> Boolean.TRUE)
-          .orElseThrow(() -> new ReportPortalException(UNABLE_INTERACT_WITH_INTEGRATION, "Board with provided id {} not found", boardId));
+          .orElseThrow(
+              () -> new ReportPortalException(UNABLE_INTERACT_WITH_INTEGRATION, "Board with provided id {} not found",
+                  boardId));
     } catch (ReportPortalException rpe) {
       throw rpe;
     } catch (Exception e) {
