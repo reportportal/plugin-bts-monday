@@ -34,7 +34,6 @@ import com.epam.reportportal.extension.monday.model.enums.MondayProperties;
 import com.epam.reportportal.extension.monday.model.graphql.GetBoardConfigQuery;
 import com.epam.reportportal.extension.monday.model.graphql.type.ColumnType;
 import com.epam.reportportal.extension.monday.model.payload.BoardSettings;
-import com.epam.reportportal.extension.util.RequestEntityConverter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -43,20 +42,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
 @Slf4j
 public class GetIssueFieldsCommand extends AbstractExtensionCommand<List<PostFormField>> {
-
-  private final ProjectRole minProjectRole = ProjectRole.EDITOR;
-  private final OrganizationRole minOrgRole = OrganizationRole.MANAGER;
-  private final UserRole minUserRole = UserRole.ADMINISTRATOR;
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(GetIssueFieldsCommand.class);
 
   //	TODO probably more
   private final Set<ColumnType> excludedColumnTypes =
@@ -72,6 +63,11 @@ public class GetIssueFieldsCommand extends AbstractExtensionCommand<List<PostFor
     super(projectRepository, organizationRepository);
     this.mondayClientProvider = mondayClientProvider;
     this.objectMapper = objectMapper;
+
+    // Set required permission levels
+    this.minProjectRole = ProjectRole.EDITOR;
+    this.minOrgRole = OrganizationRole.MANAGER;
+    this.minUserRole = UserRole.ADMINISTRATOR;
   }
 
   @Override

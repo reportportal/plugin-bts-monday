@@ -25,19 +25,22 @@ import com.epam.reportportal.base.infrastructure.persistence.entity.project.Proj
 import com.epam.reportportal.base.infrastructure.persistence.entity.user.UserRole;
 import com.epam.reportportal.extension.command.AbstractExtensionCommand;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
+@Slf4j
 public class GetIssueTypesCommand extends AbstractExtensionCommand<List<String>> {
-
-  private final ProjectRole minProjectRole = ProjectRole.EDITOR;
-  private final OrganizationRole minOrgRole = OrganizationRole.MANAGER;
-  private final UserRole minUserRole = UserRole.ADMINISTRATOR;
 
   public GetIssueTypesCommand(ProjectRepository projectRepository,
       OrganizationRepositoryCustom organizationRepository) {
     super(projectRepository, organizationRepository);
+
+    // Set required permission levels
+    this.minProjectRole = ProjectRole.EDITOR;
+    this.minOrgRole = OrganizationRole.MANAGER;
+    this.minUserRole = UserRole.ADMINISTRATOR;
   }
 
   @Override

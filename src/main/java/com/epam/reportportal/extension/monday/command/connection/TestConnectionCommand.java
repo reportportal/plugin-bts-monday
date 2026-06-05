@@ -39,16 +39,17 @@ import com.epam.reportportal.extension.monday.model.enums.MondayProperties;
  */
 public class TestConnectionCommand extends AbstractExtensionCommand<Boolean> {
 
-  private final ProjectRole minProjectRole = ProjectRole.EDITOR;
-  private final OrganizationRole minOrgRole = OrganizationRole.MANAGER;
-  private final UserRole minUserRole = UserRole.ADMINISTRATOR;
-
   private final MondayClientProvider mondayClientProvider;
 
   public TestConnectionCommand(MondayClientProvider mondayClientProvider,
       ProjectRepository projectRepository, OrganizationRepositoryCustom organizationRepository) {
     super(projectRepository, organizationRepository);
     this.mondayClientProvider = mondayClientProvider;
+
+    // Set required permission levels
+    this.minProjectRole = ProjectRole.EDITOR;
+    this.minOrgRole = OrganizationRole.MANAGER;
+    this.minUserRole = UserRole.ADMINISTRATOR;
   }
 
   @Override

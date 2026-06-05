@@ -53,20 +53,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
+@Slf4j
 public class PostTicketCommand extends AbstractExtensionCommand<Ticket> {
-
-  private final ProjectRole minProjectRole = ProjectRole.EDITOR;
-  private final OrganizationRole minOrgRole = OrganizationRole.MANAGER;
-  private final UserRole minUserRole = UserRole.ADMINISTRATOR;
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(PostTicketCommand.class);
 
   private final RequestEntityConverter requestEntityConverter;
 
@@ -97,6 +91,11 @@ public class PostTicketCommand extends AbstractExtensionCommand<Ticket> {
     this.objectMapper = objectMapper;
     this.testItemRepository = testItemRepository;
     this.logRepository = logRepository;
+
+    // Set required permission levels
+    this.minProjectRole = ProjectRole.EDITOR;
+    this.minOrgRole = OrganizationRole.MANAGER;
+    this.minUserRole = UserRole.ADMINISTRATOR;
   }
 
   @Override
@@ -157,7 +156,7 @@ public class PostTicketCommand extends AbstractExtensionCommand<Ticket> {
     try {
       return objectMapper.writeValueAsString(object);
     } catch (JsonProcessingException e) {
-      LOGGER.error(e.getMessage(), e);
+      log.error(e.getMessage(), e);
       throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
           "Unable to convert columns: " + e.getMessage()
       );

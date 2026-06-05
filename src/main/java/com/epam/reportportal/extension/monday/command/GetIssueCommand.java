@@ -44,10 +44,6 @@ import java.util.Objects;
  */
 public class GetIssueCommand extends AbstractExtensionCommand<Ticket> {
 
-  private final ProjectRole minProjectRole = ProjectRole.EDITOR;
-  private final OrganizationRole minOrgRole = OrganizationRole.MANAGER;
-  private final UserRole minUserRole = UserRole.ADMINISTRATOR;
-
   private static final String TICKET_ID = "ticketId";
   private static final String PROJECT_ID = "projectId";
 
@@ -63,6 +59,11 @@ public class GetIssueCommand extends AbstractExtensionCommand<Ticket> {
     this.mondayClientProvider = mondayClientProvider;
     this.ticketRepository = ticketRepository;
     this.integrationRepository = integrationRepository;
+
+    // Set required permission levels
+    this.minProjectRole = ProjectRole.EDITOR;
+    this.minOrgRole = OrganizationRole.MANAGER;
+    this.minUserRole = UserRole.ADMINISTRATOR;
   }
 
   @Override
