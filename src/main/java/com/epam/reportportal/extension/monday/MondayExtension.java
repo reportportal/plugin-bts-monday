@@ -23,9 +23,11 @@ import com.epam.reportportal.base.infrastructure.persistence.dao.IntegrationRepo
 import com.epam.reportportal.base.infrastructure.persistence.dao.IntegrationTypeRepository;
 import com.epam.reportportal.base.infrastructure.persistence.dao.LogRepository;
 import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectUserRepository;
 import com.epam.reportportal.base.infrastructure.persistence.dao.TestItemRepository;
 import com.epam.reportportal.base.infrastructure.persistence.dao.TicketRepository;
-import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationRepositoryCustom;
+import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationUserRepository;
 import com.epam.reportportal.extension.CommonPluginCommand;
 import com.epam.reportportal.extension.IntegrationGroupEnum;
 import com.epam.reportportal.extension.NamedPluginCommand;
@@ -114,7 +116,11 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
   @Autowired
   private ProjectRepository projectRepository;
   @Autowired
-  private OrganizationRepositoryCustom organizationRepository;
+  private ProjectUserRepository projectUserRepository;
+  @Autowired
+  private OrganizationRepository organizationRepository;
+  @Autowired
+  private OrganizationUserRepository organizationUserRepository;
   @Autowired
   private LogRepository logRepository;
   @Autowired
@@ -237,25 +243,31 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
   @Override
   public Map<String, ExtensionCommand<?>> getCommonExtensionCommands() {
     List<ExtensionCommand<?>> commands = new ArrayList<>();
-    commands.add(new RetrieveCreationParamsCommand(textEncryptor, projectRepository, organizationRepository));
-    commands.add(new RetrieveUpdateParamsCommand(textEncryptor, projectRepository, organizationRepository));
+    commands.add(new RetrieveCreationParamsCommand(textEncryptor, projectRepository, organizationUserRepository,
+        organizationRepository, projectUserRepository));
+    commands.add(new RetrieveUpdateParamsCommand(textEncryptor, projectRepository, organizationUserRepository,
+        organizationRepository, projectUserRepository));
     commands.add(
         new GetIssueCommand(mondayClientProvider.get(), ticketRepository, integrationRepository, projectRepository,
-            organizationRepository));
+            organizationUserRepository, organizationRepository, projectUserRepository));
     return commands.stream().collect(Collectors.toMap(NamedPluginCommand::getName, it -> it));
   }
 
   @Override
   public Map<String, ExtensionCommand<?>> getIntegrationExtensionCommands() {
     List<ExtensionCommand<?>> commands = new ArrayList<>();
-    commands.add(new TestConnectionCommand(mondayClientProvider.get(), projectRepository, organizationRepository));
-    commands.add(new GetIssueTypesCommand(projectRepository, organizationRepository));
+    commands.add(new TestConnectionCommand(mondayClientProvider.get(), projectRepository, organizationUserRepository,
+        organizationRepository, projectUserRepository));
+    commands.add(new GetIssueTypesCommand(projectRepository, organizationUserRepository, organizationRepository,
+        projectUserRepository));
     commands.add(
-        new GetIssueFieldsCommand(projectRepository, mondayClientProvider.get(), objectMapperSupplier.get(), organizationRepository));
+        new GetIssueFieldsCommand(projectRepository, mondayClientProvider.get(), objectMapperSupplier.get(),
+            organizationUserRepository, organizationRepository, projectUserRepository));
     commands.add(
         new PostTicketCommand(projectRepository, requestEntityConverter, mondayClientProvider.get(),
             issueParamsConverter, issueDescriptionProvider, logSenderProviderSupplier.get(),
-            objectMapperSupplier.get(), testItemRepository, logRepository, organizationRepository
+            objectMapperSupplier.get(), testItemRepository, logRepository, organizationUserRepository,
+            organizationRepository, projectUserRepository
         ));
     return commands.stream().collect(Collectors.toMap(NamedPluginCommand::getName, it -> it));
 
