@@ -242,8 +242,8 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
 
   private Map<String, CommonPluginCommand<?>> getCommonCommands() {
     List<CommonPluginCommand<?>> commands = new ArrayList<>();
-    commands.add(new RetrieveCreationParamsCommand(textEncryptor));
-    commands.add(new RetrieveUpdateParamsCommand(textEncryptor));
+    commands.add(new RetrieveCreationParamsCommand());
+    commands.add(new RetrieveUpdateParamsCommand());
     commands.add(
         new GetIssueCommand(mondayClientProvider.get(), ticketRepository, integrationRepository));
     return commands.stream().collect(Collectors.toMap(NamedPluginCommand::getName, it -> it));

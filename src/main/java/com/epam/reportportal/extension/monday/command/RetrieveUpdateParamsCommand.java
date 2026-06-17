@@ -23,18 +23,11 @@ import com.epam.reportportal.extension.monday.model.enums.MondayProperties;
 import com.google.common.collect.Maps;
 import java.util.Map;
 import java.util.Optional;
-import org.jasypt.util.text.BasicTextEncryptor;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
 public class RetrieveUpdateParamsCommand implements CommonPluginCommand<Map<String, Object>> {
-
-  private final BasicTextEncryptor textEncryptor;
-
-  public RetrieveUpdateParamsCommand(BasicTextEncryptor textEncryptor) {
-    this.textEncryptor = textEncryptor;
-  }
 
   @Override
   public String getName() {
@@ -48,10 +41,8 @@ public class RetrieveUpdateParamsCommand implements CommonPluginCommand<Map<Stri
         .ifPresent(url -> resultParams.put(MondayProperties.URL.getName(), normalizeUrl(url)));
     MondayProperties.PROJECT.findParam(integrationParams)
         .ifPresent(boardId -> resultParams.put(MondayProperties.PROJECT.getName(), boardId));
-    MondayProperties.API_TOKEN.findParam(integrationParams).ifPresent(
-        token -> resultParams.put(MondayProperties.API_TOKEN.getName(),
-            textEncryptor.encrypt(token)
-        ));
+    MondayProperties.API_TOKEN.findParam(integrationParams)
+        .ifPresent(token -> resultParams.put(MondayProperties.API_TOKEN.getName(), token));
     Optional.ofNullable(integrationParams.get("defectFormFields"))
         .ifPresent(defectFormFields -> resultParams.put("defectFormFields", defectFormFields));
     return resultParams;

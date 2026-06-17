@@ -16,27 +16,20 @@
 
 package com.epam.reportportal.extension.monday.command;
 
-import static com.epam.reportportal.extension.monday.utils.ParamUtils.normalizeUrl;
 import static com.epam.reportportal.base.infrastructure.rules.commons.validation.BusinessRule.expect;
+import static com.epam.reportportal.extension.monday.utils.ParamUtils.normalizeUrl;
 
+import com.epam.reportportal.base.infrastructure.rules.exception.ErrorType;
 import com.epam.reportportal.extension.CommonPluginCommand;
 import com.epam.reportportal.extension.monday.model.enums.MondayProperties;
-import com.epam.reportportal.base.infrastructure.rules.exception.ErrorType;
 import com.google.common.collect.Maps;
 import java.util.Map;
 import org.apache.commons.collections4.MapUtils;
-import org.jasypt.util.text.BasicTextEncryptor;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
 public class RetrieveCreationParamsCommand implements CommonPluginCommand<Map<String, Object>> {
-
-  private final BasicTextEncryptor textEncryptor;
-
-  public RetrieveCreationParamsCommand(BasicTextEncryptor textEncryptor) {
-    this.textEncryptor = textEncryptor;
-  }
 
   @Override
   public String getName() {
@@ -57,7 +50,7 @@ public class RetrieveCreationParamsCommand implements CommonPluginCommand<Map<St
     resultParams.put(
         MondayProperties.PROJECT.getName(), MondayProperties.PROJECT.getParam(integrationParams));
     resultParams.put(MondayProperties.API_TOKEN.getName(),
-        textEncryptor.encrypt(MondayProperties.API_TOKEN.getParam(integrationParams))
+        MondayProperties.API_TOKEN.getParam(integrationParams)
     );
 
     return resultParams;
