@@ -243,9 +243,9 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
   @Override
   public Map<String, ExtensionCommand<?>> getCommonExtensionCommands() {
     List<ExtensionCommand<?>> commands = new ArrayList<>();
-    commands.add(new RetrieveCreationParamsCommand(textEncryptor, projectRepository, organizationUserRepository,
+    commands.add(new RetrieveCreationParamsCommand(projectRepository, organizationUserRepository,
         organizationRepository, projectUserRepository));
-    commands.add(new RetrieveUpdateParamsCommand(textEncryptor, projectRepository, organizationUserRepository,
+    commands.add(new RetrieveUpdateParamsCommand(projectRepository, organizationUserRepository,
         organizationRepository, projectUserRepository));
     commands.add(
         new GetIssueCommand(mondayClientProvider.get(), ticketRepository, integrationRepository, projectRepository,
