@@ -18,7 +18,15 @@ package com.epam.reportportal.extension.monday.command;
 
 import static com.epam.reportportal.extension.monday.utils.ParamUtils.normalizeUrl;
 
-import com.epam.reportportal.extension.CommonPluginCommand;
+import com.epam.reportportal.api.model.PluginCommandRQ;
+import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectUserRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationUserRepository;
+import com.epam.reportportal.base.infrastructure.persistence.entity.organization.OrganizationRole;
+import com.epam.reportportal.base.infrastructure.persistence.entity.project.ProjectRole;
+import com.epam.reportportal.base.infrastructure.persistence.entity.user.UserRole;
+import com.epam.reportportal.extension.command.AbstractExtensionCommand;
 import com.epam.reportportal.extension.monday.model.enums.MondayProperties;
 import com.google.common.collect.Maps;
 import java.util.Map;
@@ -27,7 +35,18 @@ import java.util.Optional;
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
-public class RetrieveUpdateParamsCommand implements CommonPluginCommand<Map<String, Object>> {
+public class RetrieveUpdateParamsCommand extends AbstractExtensionCommand<Map<String, Object>> {
+
+  public RetrieveUpdateParamsCommand(ProjectRepository projectRepository,
+      OrganizationUserRepository organizationUserRepository, OrganizationRepository organizationRepository,
+      ProjectUserRepository projectUserRepository) {
+    super(projectRepository, organizationUserRepository, organizationRepository, projectUserRepository);
+
+    // Set required permission levels
+    this.minProjectRole = ProjectRole.EDITOR;
+    this.minOrgRole = OrganizationRole.MANAGER;
+    this.minUserRole = UserRole.ADMINISTRATOR;
+  }
 
   @Override
   public String getName() {
@@ -35,7 +54,8 @@ public class RetrieveUpdateParamsCommand implements CommonPluginCommand<Map<Stri
   }
 
   @Override
-  public Map<String, Object> executeCommand(Map<String, Object> integrationParams) {
+  public Map<String, Object> executeCommand(PluginCommandRQ pluginCommandRq) {
+    var integrationParams = pluginCommandRq.getArguments();
     Map<String, Object> resultParams = Maps.newHashMapWithExpectedSize(integrationParams.size());
     MondayProperties.URL.findParam(integrationParams)
         .ifPresent(url -> resultParams.put(MondayProperties.URL.getName(), normalizeUrl(url)));
