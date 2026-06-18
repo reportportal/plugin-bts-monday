@@ -18,11 +18,22 @@ package com.epam.reportportal.extension.monday;
 
 import com.apollographql.java.client.ApolloClient;
 import com.epam.reportportal.base.core.events.domain.PluginUploadedEvent;
+import com.epam.reportportal.base.infrastructure.persistence.binary.DataStoreService;
+import com.epam.reportportal.base.infrastructure.persistence.dao.IntegrationRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.IntegrationTypeRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.LogRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectUserRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.TestItemRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.TicketRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationUserRepository;
 import com.epam.reportportal.extension.CommonPluginCommand;
 import com.epam.reportportal.extension.IntegrationGroupEnum;
 import com.epam.reportportal.extension.NamedPluginCommand;
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.ReportPortalExtensionPoint;
+import com.epam.reportportal.extension.command.ExtensionCommand;
 import com.epam.reportportal.extension.common.IntegrationTypeProperties;
 import com.epam.reportportal.extension.monday.client.GraphQLExecutor;
 import com.epam.reportportal.extension.monday.client.MondayClientProvider;
@@ -46,19 +57,7 @@ import com.epam.reportportal.extension.monday.service.issue.converter.IssueParam
 import com.epam.reportportal.extension.monday.service.issue.log.sender.LogSenderProvider;
 import com.epam.reportportal.extension.monday.utils.MemoizingSupplier;
 import com.epam.reportportal.extension.util.RequestEntityConverter;
-import com.epam.reportportal.base.infrastructure.persistence.binary.DataStoreService;
-import com.epam.reportportal.base.infrastructure.persistence.dao.IntegrationRepository;
-import com.epam.reportportal.base.infrastructure.persistence.dao.IntegrationTypeRepository;
-import com.epam.reportportal.base.infrastructure.persistence.dao.LogRepository;
-import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectRepository;
-import com.epam.reportportal.base.infrastructure.persistence.dao.TestItemRepository;
-import com.epam.reportportal.base.infrastructure.persistence.dao.TicketRepository;
-import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationRepositoryCustom;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,8 +88,15 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
   private static final String DOCUMENTATION_LINK = "https://reportportal.io/docs/plugins/Monday";
   private static final String PLUGIN_ID = "Monday";
 
+  private final Supplier<Map<String, ExtensionCommand<?>>> pluginCommandMapping =
+      new MemoizingSupplier<>(this::getIntegrationExtensionCommands);
+  private final Supplier<Map<String, ExtensionCommand<?>>> commonPluginCommandMapping =
+      new MemoizingSupplier<>(this::getCommonExtensionCommands);
+
+  private final Supplier<ObjectMapper> objectMapperSupplier;
+
   private final String resourcesDir;
-  private final ObjectMapper objectMapper;
+
   private final RequestEntityConverter requestEntityConverter;
   private final IssueParamsConverter issueParamsConverter;
   private final IssueDescriptionProvider issueDescriptionProvider;
@@ -110,17 +116,20 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
   @Autowired
   private ProjectRepository projectRepository;
   @Autowired
-  private OrganizationRepositoryCustom organizationRepository;
+  private ProjectUserRepository projectUserRepository;
+  @Autowired
+  private OrganizationRepository organizationRepository;
+  @Autowired
+  private OrganizationUserRepository organizationUserRepository;
   @Autowired
   private LogRepository logRepository;
   @Autowired
   private TestItemRepository testItemRepository;
-  private final Supplier<Map<String, PluginCommand<?>>> pluginCommandMapping =
-      new MemoizingSupplier<>(this::getCommands);
+  @Autowired
+  private ObjectMapper objectMapper;
   @Autowired
   private BasicTextEncryptor textEncryptor;
-  private final Supplier<Map<String, CommonPluginCommand<?>>> commonPluginCommandMapping =
-      new MemoizingSupplier<>(this::getCommonCommands);
+
   @Autowired
   @Qualifier("attachmentDataStoreService")
   private DataStoreService dataStoreService;
@@ -129,7 +138,7 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
     resourcesDir =
         IntegrationTypeProperties.RESOURCES_DIRECTORY.getValue(initParams).map(String::valueOf)
             .orElse("");
-    objectMapper = configureObjectMapper();
+    objectMapperSupplier = new MemoizingSupplier<>(() -> objectMapper);
 
     pluginLoadedListenerSupplier = new MemoizingSupplier<>(() -> new PluginLoadedEventListener(
         PLUGIN_ID, integrationTypeRepository, integrationRepository,
@@ -150,15 +159,6 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
         ));
     logSenderProviderSupplier =
         new MemoizingSupplier<>(() -> new LogSenderProvider(dataStoreService));
-  }
-
-  protected ObjectMapper configureObjectMapper() {
-    ObjectMapper om = new ObjectMapper();
-    om.setAnnotationIntrospector(new JacksonAnnotationIntrospector());
-    om.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
-    om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    om.registerModule(new JavaTimeModule());
-    return om;
   }
 
   private OkHttpClient configureOkHttpClient() {
@@ -200,12 +200,12 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
 
   @Override
   public PluginCommand<?> getIntegrationCommand(String commandName) {
-    return pluginCommandMapping.get().get(commandName);
+    return null;
   }
 
   @Override
   public CommonPluginCommand<?> getCommonCommand(String commandName) {
-    return commonPluginCommandMapping.get().get(commandName);
+    return null;
   }
 
   @Override
@@ -240,26 +240,34 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
     applicationEventMulticaster.removeApplicationListener(pluginLoadedListenerSupplier.get());
   }
 
-  private Map<String, CommonPluginCommand<?>> getCommonCommands() {
-    List<CommonPluginCommand<?>> commands = new ArrayList<>();
-    commands.add(new RetrieveCreationParamsCommand(textEncryptor));
-    commands.add(new RetrieveUpdateParamsCommand(textEncryptor));
+  @Override
+  public Map<String, ExtensionCommand<?>> getCommonExtensionCommands() {
+    List<ExtensionCommand<?>> commands = new ArrayList<>();
+    commands.add(new RetrieveCreationParamsCommand(projectRepository, organizationUserRepository,
+        organizationRepository, projectUserRepository));
+    commands.add(new RetrieveUpdateParamsCommand(projectRepository, organizationUserRepository,
+        organizationRepository, projectUserRepository));
     commands.add(
-        new GetIssueCommand(mondayClientProvider.get(), ticketRepository, integrationRepository));
+        new GetIssueCommand(mondayClientProvider.get(), ticketRepository, integrationRepository, projectRepository,
+            organizationUserRepository, organizationRepository, projectUserRepository));
     return commands.stream().collect(Collectors.toMap(NamedPluginCommand::getName, it -> it));
   }
 
-  private Map<String, PluginCommand<?>> getCommands() {
-    List<PluginCommand<?>> commands = new ArrayList<>();
-    commands.add(new TestConnectionCommand(mondayClientProvider.get()));
-    commands.add(new GetIssueTypesCommand(projectRepository, organizationRepository));
+  @Override
+  public Map<String, ExtensionCommand<?>> getIntegrationExtensionCommands() {
+    List<ExtensionCommand<?>> commands = new ArrayList<>();
+    commands.add(new TestConnectionCommand(mondayClientProvider.get(), projectRepository, organizationUserRepository,
+        organizationRepository, projectUserRepository));
+    commands.add(new GetIssueTypesCommand(projectRepository, organizationUserRepository, organizationRepository,
+        projectUserRepository));
     commands.add(
-        new GetIssueFieldsCommand(projectRepository, mondayClientProvider.get(), objectMapper,
-            organizationRepository));
+        new GetIssueFieldsCommand(projectRepository, mondayClientProvider.get(), objectMapperSupplier.get(),
+            organizationUserRepository, organizationRepository, projectUserRepository));
     commands.add(
         new PostTicketCommand(projectRepository, requestEntityConverter, mondayClientProvider.get(),
             issueParamsConverter, issueDescriptionProvider, logSenderProviderSupplier.get(),
-            objectMapper, testItemRepository, logRepository, organizationRepository
+            objectMapperSupplier.get(), testItemRepository, logRepository, organizationUserRepository,
+            organizationRepository, projectUserRepository
         ));
     return commands.stream().collect(Collectors.toMap(NamedPluginCommand::getName, it -> it));
 
