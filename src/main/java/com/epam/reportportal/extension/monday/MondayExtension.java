@@ -97,7 +97,7 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
 
   private final String resourcesDir;
 
-  private final RequestEntityConverter requestEntityConverter;
+  private final Supplier<RequestEntityConverter> requestEntityConverterSupplier;
   private final IssueParamsConverter issueParamsConverter;
   private final IssueDescriptionProvider issueDescriptionProvider;
   private final Supplier<OkHttpClient> okHttpClientSupplier;
@@ -145,7 +145,8 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
         new PluginInfoProviderImpl(resourcesDir, BINARY_DATA_PROPERTIES_FILE_ID)
     ));
 
-    requestEntityConverter = new RequestEntityConverter(objectMapper);
+    requestEntityConverterSupplier =
+        new MemoizingSupplier<>(() -> new RequestEntityConverter(objectMapper));
 
     issueParamsConverter = getIssueParamsConverter();
     issueDescriptionProvider = new IssueDescriptionProvider();
@@ -264,7 +265,7 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
         new GetIssueFieldsCommand(projectRepository, mondayClientProvider.get(), objectMapperSupplier.get(),
             organizationUserRepository, organizationRepository, projectUserRepository));
     commands.add(
-        new PostTicketCommand(projectRepository, requestEntityConverter, mondayClientProvider.get(),
+        new PostTicketCommand(projectRepository, requestEntityConverterSupplier.get(), mondayClientProvider.get(),
             issueParamsConverter, issueDescriptionProvider, logSenderProviderSupplier.get(),
             objectMapperSupplier.get(), testItemRepository, logRepository, organizationUserRepository,
             organizationRepository, projectUserRepository
