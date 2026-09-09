@@ -33,6 +33,7 @@ import com.epam.reportportal.extension.IntegrationGroupEnum;
 import com.epam.reportportal.extension.NamedPluginCommand;
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.ReportPortalExtensionPoint;
+import com.epam.reportportal.extension.bugtracking.BtsActivityPublisher;
 import com.epam.reportportal.extension.command.ExtensionCommand;
 import com.epam.reportportal.extension.common.IntegrationTypeProperties;
 import com.epam.reportportal.extension.monday.client.GraphQLExecutor;
@@ -133,6 +134,9 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
   @Autowired
   @Qualifier("attachmentDataStoreService")
   private DataStoreService dataStoreService;
+
+  @Autowired
+  private BtsActivityPublisher btsActivityPublisher;
 
   public MondayExtension(Map<String, Object> initParams) {
     resourcesDir =
@@ -268,7 +272,7 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
         new PostTicketCommand(projectRepository, requestEntityConverterSupplier.get(), mondayClientProvider.get(),
             issueParamsConverter, issueDescriptionProvider, logSenderProviderSupplier.get(),
             objectMapperSupplier.get(), testItemRepository, logRepository, organizationUserRepository,
-            organizationRepository, projectUserRepository
+            organizationRepository, projectUserRepository, btsActivityPublisher
         ));
     return commands.stream().collect(Collectors.toMap(NamedPluginCommand::getName, it -> it));
 

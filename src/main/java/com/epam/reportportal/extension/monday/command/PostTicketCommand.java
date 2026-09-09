@@ -40,6 +40,7 @@ import com.epam.reportportal.base.infrastructure.persistence.entity.user.UserRol
 import com.epam.reportportal.base.infrastructure.rules.commons.validation.Suppliers;
 import com.epam.reportportal.base.infrastructure.rules.exception.ErrorType;
 import com.epam.reportportal.base.infrastructure.rules.exception.ReportPortalException;
+import com.epam.reportportal.extension.bugtracking.BtsActivityPublisher;
 import com.epam.reportportal.extension.command.AbstractExtensionCommand;
 import com.epam.reportportal.extension.monday.client.MondayClient;
 import com.epam.reportportal.extension.monday.client.MondayClientProvider;
@@ -77,6 +78,7 @@ public class PostTicketCommand extends AbstractExtensionCommand<Ticket> {
 
   private final TestItemRepository testItemRepository;
   private final LogRepository logRepository;
+  private final BtsActivityPublisher btsActivityPublisher;
 
   public PostTicketCommand(ProjectRepository projectRepository,
       RequestEntityConverter requestEntityConverter, MondayClientProvider mondayClientProvider,
@@ -84,7 +86,7 @@ public class PostTicketCommand extends AbstractExtensionCommand<Ticket> {
       LogSenderProvider logSenderProvider, ObjectMapper objectMapper,
       TestItemRepository testItemRepository, LogRepository logRepository,
       OrganizationUserRepository organizationUserRepository, OrganizationRepository organizationRepository,
-      ProjectUserRepository projectUserRepository) {
+      ProjectUserRepository projectUserRepository, BtsActivityPublisher btsActivityPublisher) {
     super(projectRepository, organizationUserRepository, organizationRepository, projectUserRepository);
     this.requestEntityConverter = requestEntityConverter;
     this.mondayClientProvider = mondayClientProvider;
@@ -94,6 +96,7 @@ public class PostTicketCommand extends AbstractExtensionCommand<Ticket> {
     this.objectMapper = objectMapper;
     this.testItemRepository = testItemRepository;
     this.logRepository = logRepository;
+    this.btsActivityPublisher = btsActivityPublisher;
 
     // Set required permission levels
     this.minProjectRole = ProjectRole.EDITOR;
@@ -137,6 +140,7 @@ public class PostTicketCommand extends AbstractExtensionCommand<Ticket> {
     ticket.setSummary(name);
     ticket.setTicketUrl(
         Suppliers.formattedSupplier("{}/boards/{}/pulses/{}", url, boardId, issueId).get());
+    btsActivityPublisher.publishTicketPostedEvent(ticket, ticketRQ, pluginCommandRq.getContext(), integration);
     return ticket;
   }
 
