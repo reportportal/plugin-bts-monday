@@ -52,12 +52,12 @@ import com.epam.reportportal.extension.monday.service.issue.log.sender.LogSender
 import com.epam.reportportal.extension.monday.service.issue.log.sender.LogSenderProvider;
 import com.epam.reportportal.extension.util.RequestEntityConverter;
 import com.epam.reportportal.extension.util.RequestEntityValidator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
@@ -74,7 +74,7 @@ public class PostTicketCommand extends AbstractExtensionCommand<Ticket> {
 
   private final LogSenderProvider logSenderProvider;
 
-  private final ObjectMapper objectMapper;
+  private final JsonMapper jsonMapper;
 
   private final TestItemRepository testItemRepository;
   private final LogRepository logRepository;
@@ -83,7 +83,7 @@ public class PostTicketCommand extends AbstractExtensionCommand<Ticket> {
   public PostTicketCommand(ProjectRepository projectRepository,
       RequestEntityConverter requestEntityConverter, MondayClientProvider mondayClientProvider,
       IssueParamsConverter issueParamsConverter, IssueDescriptionProvider issueDescriptionProvider,
-      LogSenderProvider logSenderProvider, ObjectMapper objectMapper,
+      LogSenderProvider logSenderProvider, JsonMapper jsonMapper,
       TestItemRepository testItemRepository, LogRepository logRepository,
       OrganizationUserRepository organizationUserRepository, OrganizationRepository organizationRepository,
       ProjectUserRepository projectUserRepository, BtsActivityPublisher btsActivityPublisher) {
@@ -93,7 +93,7 @@ public class PostTicketCommand extends AbstractExtensionCommand<Ticket> {
     this.issueParamsConverter = issueParamsConverter;
     this.issueDescriptionProvider = issueDescriptionProvider;
     this.logSenderProvider = logSenderProvider;
-    this.objectMapper = objectMapper;
+    this.jsonMapper = jsonMapper;
     this.testItemRepository = testItemRepository;
     this.logRepository = logRepository;
     this.btsActivityPublisher = btsActivityPublisher;
@@ -161,8 +161,8 @@ public class PostTicketCommand extends AbstractExtensionCommand<Ticket> {
 
   private String writeAsString(Object object) {
     try {
-      return objectMapper.writeValueAsString(object);
-    } catch (JsonProcessingException e) {
+      return jsonMapper.writeValueAsString(object);
+    } catch (JacksonException e) {
       log.error(e.getMessage(), e);
       throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
           "Unable to convert columns: " + e.getMessage()
