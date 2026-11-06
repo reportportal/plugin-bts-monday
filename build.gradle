@@ -1,11 +1,10 @@
 plugins {
-    id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
     id 'jacoco'
-    id 'com.gradleup.shadow' version '9.3.1'
+    id 'com.gradleup.shadow' version '9.6.1'
     id "com.github.node-gradle.node" version "7.1.0"
     id "com.apollographql.apollo" version "4.4.1"
-    id("io.freefair.lombok") version "9.5.0"
+    id("io.freefair.lombok") version "9.8.2"
 }
 
 apply from: 'project-properties.gradle'
@@ -29,16 +28,20 @@ configurations {
     implementation.extendsFrom hello
 }
 
-ext['spring-boot.version'] = "${springBootVersion}"
-
 dependencies {
     if (releaseMode) {
         implementation 'com.epam.reportportal:service-api'
-        annotationProcessor 'com.epam.reportportal:service-api'
+        annotationProcessor('com.epam.reportportal:service-api') {
+            exclude group: 'org.springframework.modulith', module: 'spring-modulith-apt'
+        }
     } else {
-        implementation 'com.github.reportportal:service-api:73c327819e'
-        annotationProcessor 'com.github.reportportal:service-api:73c327819e'
+        implementation 'com.github.reportportal:service-api:d4b2f7c'
+        annotationProcessor('com.github.reportportal:service-api:d4b2f7c') {
+            exclude group: 'org.springframework.modulith', module: 'spring-modulith-apt'
+        }
     }
+
+    compileOnly 'tools.jackson.core:jackson-databind'
 
     hello("com.apollographql.java:client:0.0.2")
     hello("com.squareup.okhttp3:okhttp:5.3.2")
@@ -150,7 +153,7 @@ tasks.register('uberJar', Jar) {
 }
 
 
-task plugin(type: Jar) {
+tasks.register('plugin', Jar) {
     getArchiveBaseName().set("plugin-${pluginId}")
     into('classes') {
         with jar
@@ -161,12 +164,12 @@ task plugin(type: Jar) {
     archiveExtension.set('zip')
 }
 
-task assemblePlugin(type: Copy) {
-    from plugin
+tasks.register('assemblePlugin', Copy) {
+    from tasks.named('plugin')
     into pluginsDir
 }
 
-task assemblePlugins(type: Copy) {
+tasks.register('assemblePlugins', Copy) {
     dependsOn subprojects.assemblePlugin
 }
 

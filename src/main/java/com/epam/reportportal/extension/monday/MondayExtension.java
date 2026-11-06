@@ -58,7 +58,6 @@ import com.epam.reportportal.extension.monday.service.issue.converter.IssueParam
 import com.epam.reportportal.extension.monday.service.issue.log.sender.LogSenderProvider;
 import com.epam.reportportal.extension.monday.utils.MemoizingSupplier;
 import com.epam.reportportal.extension.util.RequestEntityConverter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,6 +77,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.support.AbstractApplicationContext;
+import tools.jackson.databind.json.JsonMapper;
 
 @Extension
 public class MondayExtension implements ReportPortalExtensionPoint, DisposableBean {
@@ -94,7 +94,7 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
   private final Supplier<Map<String, ExtensionCommand<?>>> commonPluginCommandMapping =
       new MemoizingSupplier<>(this::getCommonExtensionCommands);
 
-  private final Supplier<ObjectMapper> objectMapperSupplier;
+  private final Supplier<JsonMapper> jsonMapperSupplier;
 
   private final String resourcesDir;
 
@@ -127,7 +127,7 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
   @Autowired
   private TestItemRepository testItemRepository;
   @Autowired
-  private ObjectMapper objectMapper;
+  private JsonMapper jsonMapper;
   @Autowired
   private BasicTextEncryptor textEncryptor;
 
@@ -142,7 +142,7 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
     resourcesDir =
         IntegrationTypeProperties.RESOURCES_DIRECTORY.getValue(initParams).map(String::valueOf)
             .orElse("");
-    objectMapperSupplier = new MemoizingSupplier<>(() -> objectMapper);
+    jsonMapperSupplier = new MemoizingSupplier<>(() -> jsonMapper);
 
     pluginLoadedListenerSupplier = new MemoizingSupplier<>(() -> new PluginLoadedEventListener(
         PLUGIN_ID, integrationTypeRepository, integrationRepository,
@@ -150,7 +150,7 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
     ));
 
     requestEntityConverterSupplier =
-        new MemoizingSupplier<>(() -> new RequestEntityConverter(objectMapper));
+        new MemoizingSupplier<>(() -> new RequestEntityConverter(jsonMapper));
 
     issueParamsConverter = getIssueParamsConverter();
     issueDescriptionProvider = new IssueDescriptionProvider();
@@ -203,11 +203,14 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
     return params;
   }
 
+  // TODO: remove both overrides once service-api drops the deprecated abstract methods
+  @Deprecated
   @Override
   public PluginCommand<?> getIntegrationCommand(String commandName) {
     return null;
   }
 
+  @Deprecated
   @Override
   public CommonPluginCommand<?> getCommonCommand(String commandName) {
     return null;
@@ -266,12 +269,12 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
     commands.add(new GetIssueTypesCommand(projectRepository, organizationUserRepository, organizationRepository,
         projectUserRepository));
     commands.add(
-        new GetIssueFieldsCommand(projectRepository, mondayClientProvider.get(), objectMapperSupplier.get(),
+        new GetIssueFieldsCommand(projectRepository, mondayClientProvider.get(), jsonMapperSupplier.get(),
             organizationUserRepository, organizationRepository, projectUserRepository));
     commands.add(
         new PostTicketCommand(projectRepository, requestEntityConverterSupplier.get(), mondayClientProvider.get(),
             issueParamsConverter, issueDescriptionProvider, logSenderProviderSupplier.get(),
-            objectMapperSupplier.get(), testItemRepository, logRepository, organizationUserRepository,
+            jsonMapperSupplier.get(), testItemRepository, logRepository, organizationUserRepository,
             organizationRepository, projectUserRepository, btsActivityPublisher
         ));
     return commands.stream().collect(Collectors.toMap(NamedPluginCommand::getName, it -> it));

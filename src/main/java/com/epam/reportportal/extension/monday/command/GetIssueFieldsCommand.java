@@ -36,14 +36,14 @@ import com.epam.reportportal.extension.monday.model.enums.MondayProperties;
 import com.epam.reportportal.extension.monday.model.graphql.GetBoardConfigQuery;
 import com.epam.reportportal.extension.monday.model.graphql.type.ColumnType;
 import com.epam.reportportal.extension.monday.model.payload.BoardSettings;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
@@ -57,15 +57,15 @@ public class GetIssueFieldsCommand extends AbstractExtensionCommand<List<PostFor
           ColumnType.subtasks);
 
   private final MondayClientProvider mondayClientProvider;
-  private final ObjectMapper objectMapper;
+  private final JsonMapper jsonMapper;
 
   public GetIssueFieldsCommand(ProjectRepository projectRepository,
-      MondayClientProvider mondayClientProvider, ObjectMapper objectMapper,
+      MondayClientProvider mondayClientProvider, JsonMapper jsonMapper,
       OrganizationUserRepository organizationUserRepository, OrganizationRepository organizationRepository,
       ProjectUserRepository projectUserRepository) {
     super(projectRepository, organizationUserRepository, organizationRepository, projectUserRepository);
     this.mondayClientProvider = mondayClientProvider;
-    this.objectMapper = objectMapper;
+    this.jsonMapper = jsonMapper;
 
     // Set required permission levels
     this.minProjectRole = ProjectRole.EDITOR;
@@ -101,11 +101,11 @@ public class GetIssueFieldsCommand extends AbstractExtensionCommand<List<PostFor
 
   private void addStatusColumn(GetBoardConfigQuery.Column c, List<AllowedValue> allowedValues) {
     try {
-      BoardSettings boardSettings = objectMapper.readValue(c.settings_str, BoardSettings.class);
+      BoardSettings boardSettings = jsonMapper.readValue(c.settings_str, BoardSettings.class);
       ofNullable(boardSettings.getLabels()).ifPresent(
           labels -> labels.forEach((k, v) -> allowedValues.add(new AllowedValue(k, k + ": " + v))));
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
+    } catch (JacksonException e) {
+      log.error("Unable to parse settings of column '{}': {}", c.id, e.getMessage(), e);
     }
   }
 
