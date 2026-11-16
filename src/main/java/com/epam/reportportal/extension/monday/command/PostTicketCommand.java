@@ -16,13 +16,32 @@
 
 package com.epam.reportportal.extension.monday.command;
 
+import static com.epam.reportportal.base.infrastructure.persistence.commons.Predicates.isNull;
+import static com.epam.reportportal.base.infrastructure.rules.commons.validation.BusinessRule.expect;
 import static com.epam.reportportal.extension.util.CommandParamUtils.ENTITY_PARAM;
-import static com.epam.reportportal.rules.commons.validation.BusinessRule.expect;
-import static com.epam.ta.reportportal.commons.Predicates.isNull;
-import static com.epam.ta.reportportal.commons.Predicates.not;
 import static java.util.Optional.ofNullable;
+import static java.util.function.Predicate.not;
 
-import com.epam.reportportal.extension.ProjectMemberCommand;
+import com.epam.reportportal.api.model.PluginCommandRQ;
+import com.epam.reportportal.base.infrastructure.model.externalsystem.PostFormField;
+import com.epam.reportportal.base.infrastructure.model.externalsystem.PostTicketRQ;
+import com.epam.reportportal.base.infrastructure.model.externalsystem.Ticket;
+import com.epam.reportportal.base.infrastructure.persistence.dao.LogRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectUserRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.TestItemRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationUserRepository;
+import com.epam.reportportal.base.infrastructure.persistence.entity.integration.Integration;
+import com.epam.reportportal.base.infrastructure.persistence.entity.log.Log;
+import com.epam.reportportal.base.infrastructure.persistence.entity.organization.OrganizationRole;
+import com.epam.reportportal.base.infrastructure.persistence.entity.project.ProjectRole;
+import com.epam.reportportal.base.infrastructure.persistence.entity.user.UserRole;
+import com.epam.reportportal.base.infrastructure.rules.commons.validation.Suppliers;
+import com.epam.reportportal.base.infrastructure.rules.exception.ErrorType;
+import com.epam.reportportal.base.infrastructure.rules.exception.ReportPortalException;
+import com.epam.reportportal.extension.bugtracking.BtsActivityPublisher;
+import com.epam.reportportal.extension.command.AbstractExtensionCommand;
 import com.epam.reportportal.extension.monday.client.MondayClient;
 import com.epam.reportportal.extension.monday.client.MondayClientProvider;
 import com.epam.reportportal.extension.monday.model.enums.MondayColumnId;
@@ -33,31 +52,18 @@ import com.epam.reportportal.extension.monday.service.issue.log.sender.LogSender
 import com.epam.reportportal.extension.monday.service.issue.log.sender.LogSenderProvider;
 import com.epam.reportportal.extension.util.RequestEntityConverter;
 import com.epam.reportportal.extension.util.RequestEntityValidator;
-import com.epam.reportportal.model.externalsystem.PostFormField;
-import com.epam.reportportal.model.externalsystem.PostTicketRQ;
-import com.epam.reportportal.model.externalsystem.Ticket;
-import com.epam.reportportal.rules.commons.validation.Suppliers;
-import com.epam.reportportal.rules.exception.ErrorType;
-import com.epam.reportportal.rules.exception.ReportPortalException;
-import com.epam.ta.reportportal.dao.LogRepository;
-import com.epam.ta.reportportal.dao.ProjectRepository;
-import com.epam.ta.reportportal.dao.TestItemRepository;
-import com.epam.ta.reportportal.entity.integration.Integration;
-import com.epam.ta.reportportal.entity.log.Log;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
-public class PostTicketCommand extends ProjectMemberCommand<Ticket> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(PostTicketCommand.class);
+@Slf4j
+public class PostTicketCommand extends AbstractExtensionCommand<Ticket> {
 
   private final RequestEntityConverter requestEntityConverter;
 
@@ -72,13 +78,16 @@ public class PostTicketCommand extends ProjectMemberCommand<Ticket> {
 
   private final TestItemRepository testItemRepository;
   private final LogRepository logRepository;
+  private final BtsActivityPublisher btsActivityPublisher;
 
   public PostTicketCommand(ProjectRepository projectRepository,
       RequestEntityConverter requestEntityConverter, MondayClientProvider mondayClientProvider,
       IssueParamsConverter issueParamsConverter, IssueDescriptionProvider issueDescriptionProvider,
       LogSenderProvider logSenderProvider, ObjectMapper objectMapper,
-      TestItemRepository testItemRepository, LogRepository logRepository) {
-    super(projectRepository);
+      TestItemRepository testItemRepository, LogRepository logRepository,
+      OrganizationUserRepository organizationUserRepository, OrganizationRepository organizationRepository,
+      ProjectUserRepository projectUserRepository, BtsActivityPublisher btsActivityPublisher) {
+    super(projectRepository, organizationUserRepository, organizationRepository, projectUserRepository);
     this.requestEntityConverter = requestEntityConverter;
     this.mondayClientProvider = mondayClientProvider;
     this.issueParamsConverter = issueParamsConverter;
@@ -87,6 +96,12 @@ public class PostTicketCommand extends ProjectMemberCommand<Ticket> {
     this.objectMapper = objectMapper;
     this.testItemRepository = testItemRepository;
     this.logRepository = logRepository;
+    this.btsActivityPublisher = btsActivityPublisher;
+
+    // Set required permission levels
+    this.minProjectRole = ProjectRole.EDITOR;
+    this.minOrgRole = OrganizationRole.MANAGER;
+    this.minUserRole = UserRole.ADMINISTRATOR;
   }
 
   @Override
@@ -95,9 +110,9 @@ public class PostTicketCommand extends ProjectMemberCommand<Ticket> {
   }
 
   @Override
-  protected Ticket invokeCommand(Integration integration, Map<String, Object> params) {
-    PostTicketRQ ticketRQ =
-        requestEntityConverter.getEntity(ENTITY_PARAM, params, PostTicketRQ.class);
+  protected Ticket invokeCommand(Integration integration, PluginCommandRQ pluginCommandRq) {
+    var params = pluginCommandRq.getArguments();
+    PostTicketRQ ticketRQ = requestEntityConverter.getEntity(ENTITY_PARAM, params, PostTicketRQ.class);
     RequestEntityValidator.validate(ticketRQ);
     expect(ticketRQ.getFields(), not(isNull())).verify(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
         "External System fields set is empty!"
@@ -125,6 +140,7 @@ public class PostTicketCommand extends ProjectMemberCommand<Ticket> {
     ticket.setSummary(name);
     ticket.setTicketUrl(
         Suppliers.formattedSupplier("{}/boards/{}/pulses/{}", url, boardId, issueId).get());
+    btsActivityPublisher.publishTicketPostedEvent(ticket, ticketRQ, pluginCommandRq.getContext(), integration);
     return ticket;
   }
 
@@ -147,7 +163,7 @@ public class PostTicketCommand extends ProjectMemberCommand<Ticket> {
     try {
       return objectMapper.writeValueAsString(object);
     } catch (JsonProcessingException e) {
-      LOGGER.error(e.getMessage(), e);
+      log.error(e.getMessage(), e);
       throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
           "Unable to convert columns: " + e.getMessage()
       );
