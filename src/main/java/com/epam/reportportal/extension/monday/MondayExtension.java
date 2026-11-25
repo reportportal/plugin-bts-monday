@@ -87,7 +87,7 @@ public class MondayExtension implements ReportPortalExtensionPoint, DisposableBe
   private static final String MONDAY_UPLOAD_FILE_URL = "https://api.monday.com/v2/file";
   private static final String DOCUMENTATION_LINK_FIELD = "documentationLink";
   private static final String DOCUMENTATION_LINK = "https://reportportal.io/docs/plugins/Monday";
-  private static final String PLUGIN_ID = "Monday";
+  private static final String PLUGIN_ID = "plugin-bts-monday";
 
   private final Supplier<Map<String, ExtensionCommand<?>>> pluginCommandMapping =
       new MemoizingSupplier<>(this::getIntegrationExtensionCommands);
